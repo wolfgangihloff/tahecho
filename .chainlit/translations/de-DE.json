@@ -1,0 +1,49 @@
+{
+  "components": {
+    "playground": {
+      "title": "Playground",
+      "run": "Ausführen",
+      "clear": "Löschen",
+      "templates": "Vorlagen",
+      "useTemplate": "Vorlage verwenden",
+      "saveTemplate": "Vorlage speichern",
+      "deleteTemplate": "Vorlage löschen",
+      "settings": "Einstellungen",
+      "templateName": "Vorlagenname",
+      "cancel": "Abbrechen",
+      "save": "Speichern",
+      "confirmDelete": "Möchten Sie diese Vorlage wirklich löschen?"
+    },
+    "sidebar": {
+      "newChat": "Neuer Chat",
+      "clearChat": "Chat löschen",
+      "settings": "Einstellungen",
+      "confirmDelete": "Möchten Sie diesen Chat wirklich löschen?"
+    },
+    "message": {
+      "copy": "Kopieren",
+      "copied": "Kopiert!",
+      "copyError": "Fehler beim Kopieren"
+    },
+    "settings": {
+      "title": "Einstellungen",
+      "theme": "Design",
+      "language": "Sprache",
+      "clearOnSubmit": "Nach Absenden löschen",
+      "enterToSubmit": "Enter zum Absenden",
+      "expandMessages": "Nachrichten erweitern",
+      "hideChains": "Gedankenketten ausblenden"
+    }
+  },
+  "actions": {
+    "success": "Aktion erfolgreich ausgeführt",
+    "error": "Fehler bei der Ausführung der Aktion"
+  },
+  "errors": {
+    "default": "Ein Fehler ist aufgetreten",
+    "fileUpload": "Fehler beim Hochladen der Datei",
+    "connection": "Verbindungsfehler",
+    "unauthorized": "Nicht autorisiert",
+    "invalidResponse": "Ungültige Antwort vom Server"
+  }
+}

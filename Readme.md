@@ -37,24 +37,19 @@ https://medium.com/@anna_backtosenses/how-the-seductive-allure-of-productivity-p
 
 ## Setup and Installation
 
-1. Create a virtual environment:
+1. Install Poetry (if not already installed):
 ```bash
-python -m venv .venv
+curl -sSL https://install.python-poetry.org | python3 -
 ```
 
-2. Activate the virtual environment:
-- On macOS/Linux:
+2. Install dependencies:
 ```bash
-source .venv/bin/activate
-```
-- On Windows:
-```bash
-.venv\Scripts\activate
+poetry install
 ```
 
-3. Install dependencies:
+3. Activate the Poetry shell:
 ```bash
-pip install -r requirements.txt
+poetry shell
 ```
 
 ## Running the Application
