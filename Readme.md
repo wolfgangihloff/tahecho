@@ -15,11 +15,30 @@ tohecho (toh) is your personal assistant to help you get your project work done 
 
 
 ### Milestone one: 100 happy product managers
+* we are self hosted, meaning we use our product for our questions ourselves weekly and create LinkedIn Blog posts and all with it
 * we have 100 product managers using this solutions, they are liking it and would not want to miss it, they use it at least once a working wee
 * we enable for them the following tasks with LLM
 ** what work finished in the last week and write a blog post for it?
 ** what work looks the most important to wrap up or spilled over?
 ** what is the overall project status?
+
+Competitors
+Some have great AI, some have great integrations as it is close to their product, but they all have an incentive to lock people in or cannot act on the layer above. The best placed would be the new AI players as they have nothing to remove user action from.
+
+* Atlassian Rovo (Jira)
+* Claude, ChatGTP - though laking integration
+* Apple Intelligence
+* Google Gemini (Gmail, GDrive)
+* The enterprise Admin or IT Policy is archaic <-- the real competitor to productivity and self-fullfillment
+** a bit like Mint.com, we do not ask the bank but give you the interface
+
+### Inspo
+* Adobe Ethos - Jira automation and Slack Integration with FAQ and issues raised
+* ProductPlan to do cost/benefit anaylsis
+* Any team I worked on and their sucking Jira process for planning
+* Product Operations, I would hate it, if this is owned and governed by Program or Project managers
+* Give a tool to Product Operations people that adheres to practices of Product People
+
 
 ### Disclaimer
 Yes we read about the list of numerous Todo apps and productivity solutions, that never were to be.
