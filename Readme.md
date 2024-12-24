@@ -25,7 +25,7 @@ tohecho (toh) is your personal assistant to help you get your project work done 
 Competitors
 Some have great AI, some have great integrations as it is close to their product, but they all have an incentive to lock people in or cannot act on the layer above. The best placed would be the new AI players as they have nothing to remove user action from.
 
-* Atlassian Rovo (Jira)
+* Atlassian Rovo (Jira) - https://www.atlassian.com/platform/artificial-intelligence
 * Claude, ChatGTP - though laking integration
 * Apple Intelligence
 * Google Gemini (Gmail, GDrive)
