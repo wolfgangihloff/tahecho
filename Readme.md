@@ -1,14 +1,15 @@
 Tahecho is your new product team member that likes to make process effective, easy and help everyone on the team, it wears the hats of scrum master, agile coach, product owner or project manager.
 
 ## Use
-"Show me my Jira issues"
-"What tasks are assigned to me?"
-"List my Jira tasks"
-"Create a summary of the task Project X finished this week."
-"Create an email of Project X for the stakeholders."
+You can ask the bot things as:
+* "Show me my Jira issues"
+* "What tasks are assigned to me?"
+* "List my Jira tasks"
+* "Create a summary of the task Project X finished this week."
+* "Create an email of Project X for the stakeholders."
 
 ## Integrations
-* Jira
+* Jira Cloud
 
 
 ## Setup and Installation
