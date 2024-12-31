@@ -13,8 +13,9 @@ You can ask the bot things as:
 
 
 ## Setup and Installation
-* setup venv with Python 3.12
-* activate
+* rm -rf .venv
+* python3.12 -m venv .venv
+* source .venv/bin/activate
 * pip install -r requirements.txt
 * setup .env file based on .env.example
 ** for Jira, find here: https://id.atlassian.com/manage-profile/security/api-tokens

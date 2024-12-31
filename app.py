@@ -49,13 +49,13 @@ client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
     api_key=os.getenv("OPENROUTER_API_KEY"),
     default_headers={
-        "HTTP-Referer": "https://github.com/wolfgangIH/tohecho",
-        "X-Title": "Tohecho Assistant"
+        "HTTP-Referer": "https://github.com/wolfgangIH/tahecho",
+        "X-Title": "Tahecho Assistant"
     }
 )
 
 # System message to set the context
-SYSTEM_MESSAGE = """You are Tohecho, a personal assistant focused on helping users with:
+SYSTEM_MESSAGE = """You are Tahecho, a personal assistant focused on helping users with:
 1. Jira task management and updates
 2. Personal todo list organization
 3. Calendar management
@@ -80,9 +80,9 @@ async def start():
     
     system_locale = locale.getdefaultlocale()[0]
     welcome_message = (
-        "Willkommen bei Tohecho! Wie kann ich Ihnen heute helfen?"
+        "Willkommen bei Tahecho! Wie kann ich Ihnen heute helfen?"
         if system_locale.startswith('de')
-        else "Welcome to tohecho! How can I assist you today?"
+        else "Welcome to Tahecho! How can I assist you today?"
     )
     await cl.Message(welcome_message).send()
 
