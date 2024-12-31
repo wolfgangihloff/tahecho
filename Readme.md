@@ -17,6 +17,7 @@ You can ask the bot things as:
 * activate
 * pip install -r requirements.txt
 * setup .env file based on .env.example
+** for Jira, find here: https://id.atlassian.com/manage-profile/security/api-tokens
 
 ## Running the Application
 
