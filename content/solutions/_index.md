@@ -51,3 +51,7 @@ We evaluate tools and resources based on:
 ## Contributing
 
 Know of other interesting tools or resources? Feel free to suggest additions to this list through our standard contribution process.
+
+## Others to evaluate
+* https://iteraite.com/
+* https://www.pragmaticinstitute.com/
