@@ -1,6 +1,7 @@
 baseURL = "/"
 title = "TaHecho"
 theme = "PaperMod"
+publishDir = "docs"
 
 [params]
 defaultTheme = "auto"
