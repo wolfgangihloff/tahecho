@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>2. Radical Clarity: Defining the Problem Space on TaHecho</title>
+    <link>//localhost:1313/chapters/2-radical-clarity/</link>
+    <description>Recent content in 2. Radical Clarity: Defining the Problem Space on TaHecho</description>
+    <generator>Hugo -- 0.140.2</generator>
+    <language>en</language>
+    <atom:link href="//localhost:1313/chapters/2-radical-clarity/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Problem Space Analysis</title>
+      <link>//localhost:1313/chapters/2-radical-clarity/problem-space-analysis/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/chapters/2-radical-clarity/problem-space-analysis/</guid>
+      <description>Techniques for analyzing and understanding the problem space</description>
+    </item>
+    <item>
+      <title>Opportunity Assessment</title>
+      <link>//localhost:1313/chapters/2-radical-clarity/opportunity-assessment/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/chapters/2-radical-clarity/opportunity-assessment/</guid>
+      <description>Frameworks and methods for evaluating product opportunities</description>
+    </item>
+    <item>
+      <title>Strategic Prioritization</title>
+      <link>//localhost:1313/chapters/2-radical-clarity/strategic-prioritization/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/chapters/2-radical-clarity/strategic-prioritization/</guid>
+      <description>Frameworks and methods for strategic prioritization in product development</description>
+    </item>
+    <item>
+      <title>Success Metrics</title>
+      <link>//localhost:1313/chapters/2-radical-clarity/success-metrics/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/chapters/2-radical-clarity/success-metrics/</guid>
+      <description>Defining and measuring success in product development</description>
+    </item>
+  </channel>
+</rss>

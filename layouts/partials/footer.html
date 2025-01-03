@@ -1,0 +1,68 @@
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-row">
+            <span class="copyright">&copy; {{ now.Year }} {{ site.Title }}</span>
+            <span class="separator">·</span>
+            <a href="/policies/">Legal Policies</a>
+            <span class="separator">·</span>
+            <a href="/imprint/">Imprint</a>
+        </div>
+        <div class="footer-row credits">
+            Powered by
+            <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+            <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+        </div>
+    </div>
+</footer>
+
+<style>
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main {
+    flex: 1;
+}
+
+.footer {
+    margin-top: auto;
+    padding: 1rem;
+    text-align: center;
+    font-size: 0.875rem;
+    border-top: 1px solid var(--border);
+}
+
+.footer-content {
+    max-width: var(--main-width);
+    margin: 0 auto;
+    padding: 1rem 0;
+}
+
+.footer-row {
+    margin: 0.5rem 0;
+    color: var(--secondary);
+}
+
+.footer-row a {
+    color: var(--secondary);
+    text-decoration: none;
+}
+
+.footer-row a:hover {
+    color: var(--primary);
+    text-decoration: underline;
+}
+
+.separator {
+    margin: 0 0.5rem;
+    color: var(--secondary);
+}
+
+.credits {
+    opacity: 0.8;
+}
+</style>
+
+{{- partial "extend_footer.html" . }}

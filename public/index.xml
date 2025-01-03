@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>TaHecho Product Team on TaHecho</title>
+    <link>//localhost:1313/</link>
+    <description>Recent content in TaHecho Product Team on TaHecho</description>
+    <generator>Hugo -- 0.140.2</generator>
+    <language>en</language>
+    <atom:link href="//localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Defining High-Output Teams</title>
+      <link>//localhost:1313/chapters/1-introduction/defining-high-output-teams/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/chapters/1-introduction/defining-high-output-teams/</guid>
+      <description>What makes a product team truly high-output</description>
+    </item>
+    <item>
+      <title>Problem Space Analysis</title>
+      <link>//localhost:1313/chapters/2-radical-clarity/problem-space-analysis/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/chapters/2-radical-clarity/problem-space-analysis/</guid>
+      <description>Techniques for analyzing and understanding the problem space</description>
+    </item>
+    <item>
+      <title>Team Structure and Roles</title>
+      <link>//localhost:1313/chapters/3-empowered-teams/team-structure-roles/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/chapters/3-empowered-teams/team-structure-roles/</guid>
+      <description>Defining effective team structures and roles in product development</description>
+    </item>
+    <item>
+      <title>Autonomy and Accountability</title>
+      <link>//localhost:1313/chapters/3-empowered-teams/autonomy-accountability/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/chapters/3-empowered-teams/autonomy-accountability/</guid>
+      <description>Balancing team autonomy with accountability in product development</description>
+    </item>
+    <item>
+      <title>Common Misconceptions</title>
+      <link>//localhost:1313/chapters/1-introduction/common-misconceptions/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/chapters/1-introduction/common-misconceptions/</guid>
+      <description>Debunking myths about product team productivity</description>
+    </item>
+    <item>
+      <title>Opportunity Assessment</title>
+      <link>//localhost:1313/chapters/2-radical-clarity/opportunity-assessment/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/chapters/2-radical-clarity/opportunity-assessment/</guid>
+      <description>Frameworks and methods for evaluating product opportunities</description>
+    </item>
+    <item>
+      <title>Decision Making Framework</title>
+      <link>//localhost:1313/chapters/3-empowered-teams/decision-making-framework/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/chapters/3-empowered-teams/decision-making-framework/</guid>
+      <description>Establishing effective decision-making processes in product teams</description>
+    </item>
+    <item>
+      <title>Guiding Principles</title>
+      <link>//localhost:1313/chapters/1-introduction/guiding-principles/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/chapters/1-introduction/guiding-principles/</guid>
+      <description>Core principles for high-output product teams</description>
+    </item>
+    <item>
+      <title>Strategic Prioritization</title>
+      <link>//localhost:1313/chapters/2-radical-clarity/strategic-prioritization/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/chapters/2-radical-clarity/strategic-prioritization/</guid>
+      <description>Frameworks and methods for strategic prioritization in product development</description>
+    </item>
+    <item>
+      <title>Success Metrics</title>
+      <link>//localhost:1313/chapters/2-radical-clarity/success-metrics/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/chapters/2-radical-clarity/success-metrics/</guid>
+      <description>Defining and measuring success in product development</description>
+    </item>
+    <item>
+      <title>Team Development</title>
+      <link>//localhost:1313/chapters/3-empowered-teams/team-development/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/chapters/3-empowered-teams/team-development/</guid>
+      <description>Strategies for continuous team growth and development</description>
+    </item>
+    <item>
+      <title>Cookie Policy</title>
+      <link>//localhost:1313/policies/cookie/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/policies/cookie/</guid>
+      <description>Cookie Policy for TaHecho Product Team Documentation</description>
+    </item>
+    <item>
+      <title>Privacy Policy</title>
+      <link>//localhost:1313/policies/privacy/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/policies/privacy/</guid>
+      <description>Privacy Policy for TaHecho Product Team Documentation</description>
+    </item>
+  </channel>
+</rss>

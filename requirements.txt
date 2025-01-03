@@ -1,4 +1,0 @@
-chainlit
-openai
-pydantic==2.10.1
-atlassian-python-api

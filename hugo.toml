@@ -1,0 +1,72 @@
+baseURL = "/"
+title = "TaHecho"
+theme = "PaperMod"
+
+[params]
+defaultTheme = "auto"
+ShowBreadCrumbs = true
+ShowPostNavLinks = true
+ShowCodeCopyButtons = true
+ShowRssButtonInSectionTermList = true
+ShowToc = true
+
+# Privacy Settings
+[privacy]
+[privacy.disqus]
+disable = true
+[privacy.googleAnalytics]
+disable = true
+respectDoNotTrack = true
+anonymizeIP = true
+useSessionStorage = true
+[privacy.instagram]
+disable = true
+simple = true
+[privacy.twitter]
+disable = true
+enableDNT = true
+simple = true
+[privacy.vimeo]
+disable = true
+enableDNT = true
+simple = true
+[privacy.youtube]
+disable = true
+privacyEnhanced = true
+
+[[menu.main]]
+identifier = "chapters"
+name = "Chapters"
+url = "/chapters/"
+weight = 10
+
+[[menu.main]]
+identifier = "docs"
+name = "Documentation"
+url = "/docs/"
+weight = 20
+
+[[menu.main]]
+identifier = "solutions"
+name = "Solutions"
+url = "/solutions/"
+weight = 30
+
+[[menu.footer]]
+identifier = "policies"
+name = "Policies"
+url = "/policies/"
+weight = 10
+
+[[menu.footer]]
+identifier = "imprint"
+name = "Imprint"
+url = "/imprint/"
+weight = 20
+
+[outputs]
+home = ["HTML", "RSS", "JSON"]
+
+[taxonomies]
+category = "categories"
+tag = "tags"

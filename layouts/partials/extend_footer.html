@@ -1,0 +1,27 @@
+<!-- Cookie Consent -->
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.js" data-cfasync="false"></script>
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+  "palette": {
+    "popup": {
+      "background": "#2b2b2b",
+      "text": "#ffffff"
+    },
+    "button": {
+      "background": "#555555",
+      "text": "#ffffff"
+    }
+  },
+  "theme": "classic",
+  "position": "bottom-right",
+  "content": {
+    "message": "This website uses cookies to ensure you get the best experience.",
+    "dismiss": "Accept",
+    "link": "Cookie Policy",
+    "href": "/policies/cookie/"
+  }
+});
+});
+</script>

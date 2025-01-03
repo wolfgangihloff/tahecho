@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>Strategic Prioritization | TaHecho</title>
+<meta name="keywords" content="">
+<meta name="description" content="Frameworks and methods for strategic prioritization in product development">
+<meta name="author" content="">
+<link rel="canonical" href="//localhost:1313/chapters/2-radical-clarity/strategic-prioritization/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.d6fcd20a4fb86efa4dfac8ec95da60244cc8871042183da1ef28e3a762ad79c8.css" integrity="sha256-1vzSCk&#43;4bvpN&#43;sjsldpgJEzIhxBCGD2h7yjjp2Ktecg=" rel="preload stylesheet" as="style">
+<link rel="icon" href="//localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="//localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="//localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="//localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="//localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="//localhost:1313/chapters/2-radical-clarity/strategic-prioritization/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="//localhost:1313/" accesskey="h" title="TaHecho (Alt + H)">TaHecho</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="//localhost:1313/chapters/" title="Chapters">
+                    <span>Chapters</span>
+                </a>
+            </li>
+            <li>
+                <a href="//localhost:1313/docs/" title="Documentation">
+                    <span>Documentation</span>
+                </a>
+            </li>
+            <li>
+                <a href="//localhost:1313/solutions/" title="Solutions">
+                    <span>Solutions</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="//localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="//localhost:1313/chapters/">Chapters</a>&nbsp;»&nbsp;<a href="//localhost:1313/chapters/2-radical-clarity/">2. Radical Clarity: Defining the Problem Space</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Strategic Prioritization
+    </h1>
+    <div class="post-description">
+      Frameworks and methods for strategic prioritization in product development
+    </div>
+    <div class="post-meta">
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#strategic-prioritization" aria-label="Strategic Prioritization">Strategic Prioritization</a><ul>
+                        
+                <li>
+                    <a href="#prioritization-frameworks" aria-label="Prioritization Frameworks">Prioritization Frameworks</a><ul>
+                        
+                <li>
+                    <a href="#1-rice-scoring" aria-label="1. RICE Scoring">1. RICE Scoring</a></li>
+                <li>
+                    <a href="#2-value-vs-effort-matrix" aria-label="2. Value vs Effort Matrix">2. Value vs Effort Matrix</a></li>
+                <li>
+                    <a href="#3-kano-model" aria-label="3. Kano Model">3. Kano Model</a></li></ul>
+                </li>
+                <li>
+                    <a href="#strategic-alignment" aria-label="Strategic Alignment">Strategic Alignment</a><ul>
+                        
+                <li>
+                    <a href="#business-goals-alignment" aria-label="Business Goals Alignment">Business Goals Alignment</a></li>
+                <li>
+                    <a href="#resource-optimization" aria-label="Resource Optimization">Resource Optimization</a></li></ul>
+                </li>
+                <li>
+                    <a href="#decision-making-process" aria-label="Decision Making Process">Decision Making Process</a><ul>
+                        
+                <li>
+                    <a href="#input-gathering" aria-label="Input Gathering">Input Gathering</a></li>
+                <li>
+                    <a href="#prioritization-workshop" aria-label="Prioritization Workshop">Prioritization Workshop</a></li></ul>
+                </li>
+                <li>
+                    <a href="#implementation-strategy" aria-label="Implementation Strategy">Implementation Strategy</a><ul>
+                        
+                <li>
+                    <a href="#roadmap-development" aria-label="Roadmap Development">Roadmap Development</a></li>
+                <li>
+                    <a href="#communication-plan" aria-label="Communication Plan">Communication Plan</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h1 id="strategic-prioritization">Strategic Prioritization<a hidden class="anchor" aria-hidden="true" href="#strategic-prioritization">#</a></h1>
+<h2 id="prioritization-frameworks">Prioritization Frameworks<a hidden class="anchor" aria-hidden="true" href="#prioritization-frameworks">#</a></h2>
+<h3 id="1-rice-scoring">1. RICE Scoring<a hidden class="anchor" aria-hidden="true" href="#1-rice-scoring">#</a></h3>
+<ul>
+<li><strong>Reach</strong>: How many users/customers will this impact?</li>
+<li><strong>Impact</strong>: How much will it impact each user?</li>
+<li><strong>Confidence</strong>: How confident are we in our estimates?</li>
+<li><strong>Effort</strong>: How much time/resources will it take?</li>
+</ul>
+<pre tabindex="0"><code>RICE Score = (Reach × Impact × Confidence) ÷ Effort
+</code></pre><h3 id="2-value-vs-effort-matrix">2. Value vs Effort Matrix<a hidden class="anchor" aria-hidden="true" href="#2-value-vs-effort-matrix">#</a></h3>
+<ul>
+<li>High Value, Low Effort: Quick Wins</li>
+<li>High Value, High Effort: Strategic Projects</li>
+<li>Low Value, Low Effort: Fill-Ins</li>
+<li>Low Value, High Effort: Time Sinks</li>
+</ul>
+<h3 id="3-kano-model">3. Kano Model<a hidden class="anchor" aria-hidden="true" href="#3-kano-model">#</a></h3>
+<ul>
+<li><strong>Basic Features</strong>: Must-have functionality</li>
+<li><strong>Performance Features</strong>: Better = More satisfied</li>
+<li><strong>Excitement Features</strong>: Unexpected delight</li>
+<li><strong>Indifferent Features</strong>: Neither satisfaction nor dissatisfaction</li>
+</ul>
+<h2 id="strategic-alignment">Strategic Alignment<a hidden class="anchor" aria-hidden="true" href="#strategic-alignment">#</a></h2>
+<h3 id="business-goals-alignment">Business Goals Alignment<a hidden class="anchor" aria-hidden="true" href="#business-goals-alignment">#</a></h3>
+<ol>
+<li>Revenue Impact</li>
+<li>Cost Reduction</li>
+<li>Market Share</li>
+<li>Customer Satisfaction</li>
+<li>Strategic Position</li>
+</ol>
+<h3 id="resource-optimization">Resource Optimization<a hidden class="anchor" aria-hidden="true" href="#resource-optimization">#</a></h3>
+<ol>
+<li>Team Capacity</li>
+<li>Technical Dependencies</li>
+<li>Timeline Constraints</li>
+<li>Budget Allocation</li>
+<li>Risk Management</li>
+</ol>
+<h2 id="decision-making-process">Decision Making Process<a hidden class="anchor" aria-hidden="true" href="#decision-making-process">#</a></h2>
+<h3 id="input-gathering">Input Gathering<a hidden class="anchor" aria-hidden="true" href="#input-gathering">#</a></h3>
+<ol>
+<li>Customer Feedback</li>
+<li>Market Research</li>
+<li>Technical Assessment</li>
+<li>Resource Analysis</li>
+<li>Stakeholder Input</li>
+</ol>
+<h3 id="prioritization-workshop">Prioritization Workshop<a hidden class="anchor" aria-hidden="true" href="#prioritization-workshop">#</a></h3>
+<ol>
+<li>
+<p>Preparation</p>
+<ul>
+<li>Data collection</li>
+<li>Stakeholder identification</li>
+<li>Framework selection</li>
+</ul>
+</li>
+<li>
+<p>Execution</p>
+<ul>
+<li>Scoring exercises</li>
+<li>Discussion rounds</li>
+<li>Consensus building</li>
+</ul>
+</li>
+<li>
+<p>Output</p>
+<ul>
+<li>Prioritized backlog</li>
+<li>Action items</li>
+<li>Timeline</li>
+<li>Resource allocation</li>
+</ul>
+</li>
+</ol>
+<h2 id="implementation-strategy">Implementation Strategy<a hidden class="anchor" aria-hidden="true" href="#implementation-strategy">#</a></h2>
+<h3 id="roadmap-development">Roadmap Development<a hidden class="anchor" aria-hidden="true" href="#roadmap-development">#</a></h3>
+<ol>
+<li>Short-term priorities (0-3 months)</li>
+<li>Medium-term goals (3-6 months)</li>
+<li>Long-term vision (6+ months)</li>
+</ol>
+<h3 id="communication-plan">Communication Plan<a hidden class="anchor" aria-hidden="true" href="#communication-plan">#</a></h3>
+<ol>
+<li>Stakeholder updates</li>
+<li>Team alignment</li>
+<li>Progress tracking</li>
+<li>Adjustment mechanisms</li>
+</ol>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="//localhost:1313/chapters/1-introduction/guiding-principles/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>Guiding Principles</span>
+  </a>
+  <a class="next" href="//localhost:1313/chapters/2-radical-clarity/success-metrics/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Success Metrics</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    <footer class="footer">
+    <div>
+        <span>&copy; 2025 <a href="//localhost:1313/">TaHecho</a></span>
+        <span class="footer-links">
+            <a href="/policies/">Legal Policies</a>
+        </span>
+    </div>
+    <div>
+        <span>
+            Powered by
+            <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+            <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+        </span>
+    </div>
+</footer>
+
+<style>
+.footer {
+    text-align: center;
+    padding: 30px 0;
+}
+.footer div {
+    margin: 10px 0;
+}
+.footer-links {
+    margin-left: 20px;
+}
+.footer-links a {
+    font-weight: 500;
+}
+</style>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.js" data-cfasync="false"></script>
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+  "palette": {
+    "popup": {
+      "background": "#2b2b2b",
+      "text": "#ffffff"
+    },
+    "button": {
+      "background": "#555555",
+      "text": "#ffffff"
+    }
+  },
+  "theme": "classic",
+  "position": "bottom-right",
+  "content": {
+    "message": "This website uses cookies to ensure you get the best experience.",
+    "dismiss": "Accept",
+    "link": "Cookie Policy",
+    "href": "/policies/cookie/"
+  }
+});
+});
+</script>
+
+</body>
+
+</html>

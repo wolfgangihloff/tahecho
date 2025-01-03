@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>3. Empowered Teams: The Foundation of Innovation on TaHecho</title>
+    <link>//localhost:1313/chapters/3-empowered-teams/</link>
+    <description>Recent content in 3. Empowered Teams: The Foundation of Innovation on TaHecho</description>
+    <generator>Hugo -- 0.140.2</generator>
+    <language>en</language>
+    <atom:link href="//localhost:1313/chapters/3-empowered-teams/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Team Structure and Roles</title>
+      <link>//localhost:1313/chapters/3-empowered-teams/team-structure-roles/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/chapters/3-empowered-teams/team-structure-roles/</guid>
+      <description>Defining effective team structures and roles in product development</description>
+    </item>
+    <item>
+      <title>Autonomy and Accountability</title>
+      <link>//localhost:1313/chapters/3-empowered-teams/autonomy-accountability/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/chapters/3-empowered-teams/autonomy-accountability/</guid>
+      <description>Balancing team autonomy with accountability in product development</description>
+    </item>
+    <item>
+      <title>Decision Making Framework</title>
+      <link>//localhost:1313/chapters/3-empowered-teams/decision-making-framework/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/chapters/3-empowered-teams/decision-making-framework/</guid>
+      <description>Establishing effective decision-making processes in product teams</description>
+    </item>
+    <item>
+      <title>Team Development</title>
+      <link>//localhost:1313/chapters/3-empowered-teams/team-development/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>//localhost:1313/chapters/3-empowered-teams/team-development/</guid>
+      <description>Strategies for continuous team growth and development</description>
+    </item>
+  </channel>
+</rss>
