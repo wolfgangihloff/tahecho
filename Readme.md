@@ -29,3 +29,11 @@ chainlit run app.py
 ```
 
 The application will be available at http://localhost:8000
+
+## License
+
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+
+## Third-Party Software
+
+This project uses third-party software components. For detailed information about these components and their licenses, please see [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
