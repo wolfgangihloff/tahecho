@@ -4,9 +4,27 @@ import locale
 from openai import OpenAI
 from dotenv import load_dotenv
 from atlassian import Jira
+import requests
+from requests.auth import HTTPBasicAuth
+
 
 # Load environment variables
 load_dotenv()
+
+# Initialize OpenAI client
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+
+cl.instrument_openai()
+
+settings = {
+    "model": "gpt-4o",
+    "temperature": 0.7,
+    "max_tokens": 1000,
+    "top_p": 1,
+    "frequency_penalty": 0,
+    "presence_penalty": 0,
+    "stream": False,
+}
 
 # Initialize Jira client
 jira = None
@@ -26,7 +44,8 @@ async def get_my_jira_issues():
         return "Jira client is not initialized. Please check your environment variables."
     try:
         # JQL query to find issues assigned to the current user
-        jql = "assignee = currentUser() ORDER BY updated DESC"
+        
+        jql = "assignee = currentUser() ORDER BY created DESC"
         issues = jira.jql(jql)
         
         if not issues.get('issues'):
@@ -35,6 +54,8 @@ async def get_my_jira_issues():
         # Format the issues into a readable list
         formatted_issues = []
         for issue in issues['issues']:
+            print(f"Tarea: {issue['fields']['summary']}\n")
+            print(f"Description: {issue['fields']['description']}\n")
             key = issue['key']
             summary = issue['fields']['summary']
             status = issue['fields']['status']['name']
@@ -43,16 +64,7 @@ async def get_my_jira_issues():
         return "\n".join(formatted_issues)
     except Exception as e:
         return f"Error fetching Jira issues: {e}"
-
-# Initialize OpenAI client with OpenRouter base URL and headers
-client = OpenAI(
-    base_url="https://openrouter.ai/api/v1",
-    api_key=os.getenv("OPENROUTER_API_KEY"),
-    default_headers={
-        "HTTP-Referer": "https://github.com/wolfgangIH/tahecho",
-        "X-Title": "Tahecho Assistant"
-    }
-)
+    
 
 # System message to set the context
 SYSTEM_MESSAGE = """You are Tahecho, a personal assistant focused on helping users with:
@@ -91,35 +103,41 @@ async def main(message: cl.Message):
     # Get the chat history
     messages = cl.user_session.get("messages")
     
-    # Check if the message is asking about Jira issues
-    if any(keyword in message.content.lower() for keyword in ['jira', 'issues', 'tasks', 'assigned']):
-        issues = await get_my_jira_issues()
-        await cl.Message(content=issues).send()
-        return
-    
     # Add user message to history
     messages.append({"role": "user", "content": message.content})
-    
-    # Get response from OpenRouter
+
+    functions = [
+        {
+            "name": "get_my_jira_issues",
+            "description": "Retrieve a list of Jira issues assigned to the current user.",
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "required": []
+            }
+        }
+    ]
+
     response = client.chat.completions.create(
-        model=os.getenv("OPENROUTER_MODEL", "anthropic/claude-3-opus-20240229"),
-        messages=messages,
-        stream=True,
+        messages = messages,
+        functions=functions,
+        function_call="auto",
+        **settings
     )
-    
-    # Initialize the response message
-    msg = cl.Message(content="")
-    
-    # Stream the response
-    for chunk in response:
-        if chunk.choices[0].delta.content is not None:
-            await msg.stream_token(chunk.choices[0].delta.content)
-    
-    # Send the final message
-    await msg.send()
-    
+
+    if response.choices[0].message.function_call:
+        function_name = response.choices[0].message.function_call.name
+        if function_name == "get_my_jira_issues":
+            # Call the function to get Jira issues
+            issues = await get_my_jira_issues()
+            await cl.Message(content=f"Here are your Jira issues:\n{issues}").send()
+            return
+
+    # If no function call, send the assistant's response
+    assistant_response = response.choices[0].message.content
+    await cl.Message(content=assistant_response).send()    
     # Add assistant's response to history
-    messages.append({"role": "assistant", "content": msg.content})
+    messages.append({"role": "assistant", "content": assistant_response})
     
     # Update the chat history in the session
     cl.user_session.set("messages", messages)
