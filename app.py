@@ -1,70 +1,9 @@
-import os
 import chainlit as cl
 import locale
-from openai import OpenAI
-from dotenv import load_dotenv
-from atlassian import Jira
-import requests
-from requests.auth import HTTPBasicAuth
+from intent_handler import handle_function_call
+from config import CONFIG
+from openai_client import get_openai_response
 
-
-# Load environment variables
-load_dotenv()
-
-# Initialize OpenAI client
-client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
-
-cl.instrument_openai()
-
-settings = {
-    "model": "gpt-4o",
-    "temperature": 0.7,
-    "max_tokens": 1000,
-    "top_p": 1,
-    "frequency_penalty": 0,
-    "presence_penalty": 0,
-    "stream": False,
-}
-
-# Initialize Jira client
-jira = None
-try:
-    jira = Jira(
-        url=os.getenv('JIRA_INSTANCE_URL'),
-        username=os.getenv('JIRA_USERNAME'),
-        password=os.getenv('JIRA_API_TOKEN'),
-        cloud=os.getenv('JIRA_CLOUD', 'True').lower() == 'true'
-    )
-except Exception as e:
-    print(f"Failed to initialize Jira client: {e}")
-
-async def get_my_jira_issues():
-    """Get issues assigned to the current user"""
-    if not jira:
-        return "Jira client is not initialized. Please check your environment variables."
-    try:
-        # JQL query to find issues assigned to the current user
-        
-        jql = "assignee = currentUser() ORDER BY created DESC"
-        issues = jira.jql(jql)
-        
-        if not issues.get('issues'):
-            return "No issues found assigned to you."
-            
-        # Format the issues into a readable list
-        formatted_issues = []
-        for issue in issues['issues']:
-            print(f"Tarea: {issue['fields']['summary']}\n")
-            print(f"Description: {issue['fields']['description']}\n")
-            key = issue['key']
-            summary = issue['fields']['summary']
-            status = issue['fields']['status']['name']
-            formatted_issues.append(f"- {key}: {summary} (Status: {status})")
-            
-        return "\n".join(formatted_issues)
-    except Exception as e:
-        return f"Error fetching Jira issues: {e}"
-    
 
 # System message to set the context
 SYSTEM_MESSAGE = """You are Tahecho, a personal assistant focused on helping users with:
@@ -118,20 +57,12 @@ async def main(message: cl.Message):
         }
     ]
 
-    response = client.chat.completions.create(
-        messages = messages,
-        functions=functions,
-        function_call="auto",
-        **settings
-    )
+    response = get_openai_response(messages, functions)
 
-    if response.choices[0].message.function_call:
-        function_name = response.choices[0].message.function_call.name
-        if function_name == "get_my_jira_issues":
-            # Call the function to get Jira issues
-            issues = await get_my_jira_issues()
-            await cl.Message(content=f"Here are your Jira issues:\n{issues}").send()
-            return
+    function_response = await handle_function_call(response)
+    if function_response:
+        await cl.Message(content=function_response).send()
+        return
 
     # If no function call, send the assistant's response
     assistant_response = response.choices[0].message.content
