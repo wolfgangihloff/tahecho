@@ -1,8 +1,11 @@
+from agent import process_user_request
 import chainlit as cl
 import locale
 from intent_handler import handle_function_call
 from config import CONFIG
+from jira_client import JiraClient
 from openai_client import get_openai_response
+
 
 
 # System message to set the context
@@ -57,18 +60,10 @@ async def main(message: cl.Message):
         }
     ]
 
-    response = get_openai_response(messages, functions)
-
-    function_response = await handle_function_call(response)
-    if function_response:
-        await cl.Message(content=function_response).send()
-        return
-
-    # If no function call, send the assistant's response
-    assistant_response = response.choices[0].message.content
-    await cl.Message(content=assistant_response).send()    
+    response = process_user_request(message.content)  
+    await cl.Message(content=response).send()
     # Add assistant's response to history
-    messages.append({"role": "assistant", "content": assistant_response})
+    messages.append({"role": "assistant", "content": response})
     
     # Update the chat history in the session
     cl.user_session.set("messages", messages)
