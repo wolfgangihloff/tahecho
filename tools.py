@@ -22,7 +22,7 @@ jira_client = JiraClient()  # Instancia global del cliente Jira
 
 @tool
 def get_my_jira_issues() -> Dict[str, Any]:
-    """Obtiene las tareas de Jira asignadas al usuario actual y devuelve los datos en JSON."""
+    """Obtains the Jira issues assigned to the current user and returns them as JSON."""
     
     if not jira_client.jira:
         return {"error": "Jira client is not initialized. Check environment variables."}
@@ -39,7 +39,7 @@ def get_my_jira_issues() -> Dict[str, Any]:
                 {
                     "key": issue["key"],
                     "summary": issue["fields"]["summary"],
-                    "status": issue["fields"]["status"]["name"]
+                    "status": issue["fields"]["status"]["name"],
                 }
                 for issue in issues["issues"]
             ]
@@ -47,3 +47,38 @@ def get_my_jira_issues() -> Dict[str, Any]:
 
     except Exception as e:
         return {"error": f"Error fetching Jira issues: {str(e)}"}
+    
+
+@tool
+def get_finished_issues() -> Dict[str, Any]:
+    """Obtains the Jira issues that are finished and returns them as JSON."""
+    
+    if not jira_client.jira:
+        return {"error": "Jira client is not initialized. Check environment variables."}
+    
+    try:
+        jql = "status = Done ORDER BY created DESC"
+        issues = jira_client.jira.jql(jql)
+        
+        if not issues.get("issues"):
+            return {"message": "No finished issues found."}
+        
+        
+        return {
+            "issues": [
+                {
+                    "key": issue["key"],
+                    "summary": issue["fields"]["summary"],
+                    "status": issue["fields"]["status"]["name"],
+                    "resolution_date": issue["fields"].get("resolutiondate", "Not available"),
+                    "project_key": issue["fields"]["project"]["key"],
+                    "project_name": issue["fields"]["project"]["name"]
+                }
+                for issue in issues["issues"]
+            ]
+        }
+    
+    except Exception as e:
+        return {"error": f"Error fetching Jira issues: {str(e)}"}
+    
+    
