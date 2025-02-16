@@ -1,15 +1,16 @@
 from config import CONFIG
 from smolagents import OpenAIServerModel
 from smolagents.agents import ToolCallingAgent
-from tools import get_finished_issues, get_my_jira_issues
+from tools import createJiraIssueTool, get_finished_issues, get_my_jira_issues
 
+create_jira_issue_tool=createJiraIssueTool()
 
 agent = ToolCallingAgent(
     model=OpenAIServerModel(
         model_id="gpt-4o",
         api_key=CONFIG["OPENAI_API_KEY"]
         ),
-        tools=[get_my_jira_issues, get_finished_issues],
+        tools=[get_my_jira_issues, get_finished_issues, create_jira_issue_tool],
         add_base_tools=False
 )
 
