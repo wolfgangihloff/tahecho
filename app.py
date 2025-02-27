@@ -1,6 +1,6 @@
 import json
 from openai import OpenAI
-from agent import process_user_request
+from agents.jira_issues_agent import process_user_request
 from cache import fetch_and_cache_jira_issues
 import chainlit as cl
 import locale
