@@ -1,5 +1,6 @@
 import json
 from typing import Any, Dict, Optional
+from cache import get_cached_jira_issues
 from config import CONFIG
 from smolagents import tool, Tool
 from atlassian import Jira
@@ -20,82 +21,30 @@ class JiraClient:
 
 jira_client = JiraClient()  # Instancia global del cliente Jira
 
-
-class JiraDataTool(Tool):
-    name = "Jira issues data retriever"
-    description = """
-    This is a tool that makes a request to the jira API to get all the issues and returns only the jira issues
-    that the user is asking for with the information needed.
-    """
-    inputs = {
-        "status": {
-            "type": "string",
-            "description": "the status of the requested issues",
-        }
-    }
-    
+class getAllJiraIssuesTool(Tool):
+    name = "get_all_jira_issues"
+    description = "Return all the Jira issues of the site"
+    inputs = {}
     output_type = "string"
     
-    
-
-
-@tool
-def get_my_jira_issues() -> Dict[str, Any]:
-    """Obtains the Jira issues assigned to the current user and returns them as JSON."""
-    
-    if not jira_client.jira:
-        return {"error": "Jira client is not initialized. Check environment variables."}
-
-    try:
-        jql = "assignee = currentUser() ORDER BY created DESC"
-        issues = jira_client.jira.jql(jql)
-
-        if not issues.get("issues"):
-            return {"message": "No issues found assigned to you."}
-
-        return {
-            "issues": [
-                {
-                    "key": issue["key"],
-                    "summary": issue["fields"]["summary"],
-                    "status": issue["fields"]["status"]["name"],
-                }
-                for issue in issues["issues"]
-            ]
-        }
-
-    except Exception as e:
-        return {"error": f"Error fetching Jira issues: {str(e)}"}
-    
-
-@tool
-def get_finished_issues() -> Dict[str, Any]:
-    """Obtains the Jira issues that are finished and returns them as JSON."""
-    
-    if not jira_client.jira:
-        return {"error": "Jira client is not initialized. Check environment variables."}
-    
-    try:
-        jql = "status = Done ORDER BY created DESC"
-        issues = jira_client.jira.jql(jql)
-        if not issues.get("issues"):
-            return {"message": "No finished issues found."}
+    def forward(self): 
+        issues = get_cached_jira_issues()
+        print(issues)
         
-        
-        return issues
-    
-    except Exception as e:
-        return {"error": f"Error fetching Jira issues: {str(e)}"}
-    
+        #return json.dumps(issues) if isinstance(issues, dict) else "No hay incidencias almacenadas."
+        if not issues or not isinstance(issues, list):
+            return "No hay incidencias almacenadas."
+
+        return json.dumps(issues, indent=2)
 
 
 class createJiraIssueTool(Tool):
     name = "create_jira_issue"
     description = "Create new Jira issue with the fields defined by the inputs"
     inputs = {
-        "project_id": {
+        "project_key": {
             "type": "string",
-            "description": "id of the project of the issue"
+            "description": "key of the project of the issue"
         },
         "summary": {
             "type": "string",
@@ -105,24 +54,24 @@ class createJiraIssueTool(Tool):
             "type": "string",
             "description": "description of the issue"
         },
-        "id_issuetype": {
+        "issuetype": {
             "type": "string",
-            "description": "id of the issue type used"
+            "description": "name of the issue type used"
         }
     }
     
     output_type = "string"
     
-    def forward(self, project_id: str, summary: str, description: str, id_issuetype: str):
+    def forward(self, project_key: str, summary: str, description: str, issuetype: str):
         if not jira_client.jira:
             return {"error": "Jira client is not initialized. Check environment variables."}
 
         try:
             issue_data = {
-                "project": {"id": project_id},
+                "project": {"key": project_key},
                 "summary": summary,
                 "description": description,
-                "issuetype": {"id": id_issuetype},
+                "issuetype": {"name": issuetype},
             }
             new_issue = jira_client.jira.create_issue(fields=issue_data)
             result = {
