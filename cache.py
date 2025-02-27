@@ -1,5 +1,3 @@
-import json
-
 from jira_integration.jira_client import jira_client
 
 jira_issues_cache = None

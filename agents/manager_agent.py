@@ -1,6 +1,4 @@
 from smolagents.agents import CodeAgent, ToolCallingAgent
-from agent_tools.get_all_jira_issues_tool import GetAllJiraIssuesTool
-from models.openai_model import openai_model
 
 get_all_jira_issues_tool = GetAllJiraIssuesTool()
 

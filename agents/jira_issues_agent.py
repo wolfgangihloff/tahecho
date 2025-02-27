@@ -1,9 +1,7 @@
 from smolagents.agents import ToolCallingAgent
 from agent_tools.create_jira_issue_tool import CreateJiraIssueTool
 from agent_tools.get_jira_issues_tool import GetJiraIssuesTool
-from config import CONFIG
 from models.openai_model import openai_model
-from smolagents import OpenAIServerModel
 
 get_all_jira_issues_tool=GetJiraIssuesTool()
 create_jira_issue_tool=CreateJiraIssueTool()
