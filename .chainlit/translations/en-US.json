@@ -57,7 +57,7 @@
     },
     "chat": {
         "input": {
-            "placeholder": "Type your message here...",
+            "placeholder": "Type any Jira action...",
             "actions": {
                 "send": "Send message",
                 "stop": "Stop Task",

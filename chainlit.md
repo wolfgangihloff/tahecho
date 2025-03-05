@@ -1,14 +1,19 @@
-# Welcome to Chainlit! 🚀🤖
+# TaHecho: AI-Powered Jira Assistant 💙🤖
 
-Hi there, Developer! 👋 We're excited to have you on board. Chainlit is a powerful tool designed to help you prototype, debug and share applications built on top of LLMs.
+Welcome to **TaHecho**! 🚀  
+TaHecho is an AI-driven chatbot designed to **integrate with Jira**, allowing users to efficiently **manage issues, track progress, and automate Jira tasks** using natural language.  
 
-## Useful Links 🔗
+Built with **Chainlit**, **SmolAgents**, and **OpenAI's API**, TaHecho provides an **interactive and scalable solution** for task management.  
 
-- **Documentation:** Get started with our comprehensive [Chainlit Documentation](https://docs.chainlit.io) 📚
-- **Discord Community:** Join our friendly [Chainlit Discord](https://discord.gg/k73SQ3FyUh) to ask questions, share your projects, and connect with other developers! 💬
+## 🌟 Features
 
-We can't wait to see what you create with Chainlit! Happy coding! 💻😊
+✅ **Retrieve Jira Issues**: Fetch all issues, filter completed tasks, or query specific Jira data.  
+✅ **Create Issues**: Easily generate Jira issues with project, title, description, and type.  
+✅ **Agent-Based Processing**: Uses `smolagents` to dynamically call tools only when needed.  
 
-## Welcome screen
+## 🚀 Installation & Setup
 
-To modify the welcome screen, edit the `chainlit.md` file at the root of your project. If you do not want a welcome screen, just leave this file empty.
+### 1️⃣ Clone the Repository
+```bash
+git clone https://github.com/your-repo/TaHecho.git
+cd TaHecho

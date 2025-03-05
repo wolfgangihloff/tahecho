@@ -42,7 +42,7 @@ class CreateJiraIssueTool(Tool):
             new_issue = jira_client.get_instance().create_issue(fields=issue_data)
             result = {
                 "message": "Incidencia creada exitosamente.",
-                "issue": f"{jira_client.get_instance().url}/jira/software/projects/{project_key}/list?selectedIssue={new_issue["key"]}",
+                "issue": f"{jira_client.get_instance().url}/jira/software/projects/{project_key}/list?selectedIssue={new_issue['key']}",
             }
             
             return json.dumps(result)
