@@ -1,4 +1,4 @@
-from smolagents.agents import ToolCallingAgent
+from smolagents import ToolCallingAgent
 from agent_tools.create_jira_issue_tool import CreateJiraIssueTool
 from agent_tools.get_jira_issues_tool import GetJiraIssuesTool
 from models.openai_model import openai_model
@@ -8,8 +8,10 @@ create_jira_issue_tool=CreateJiraIssueTool()
 
 jira_issues_agent = ToolCallingAgent(
     model=openai_model,
-        tools=[get_all_jira_issues_tool, create_jira_issue_tool],
-        add_base_tools=False
+    tools=[get_all_jira_issues_tool, create_jira_issue_tool],
+    add_base_tools=False,
+    name="jira_issues_agent",
+    description="Get and creates all Jira issues.",
 )
 
 def process_user_request(user_input):

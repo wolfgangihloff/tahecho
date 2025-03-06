@@ -4,6 +4,10 @@ from cache import fetch_and_cache_jira_issues
 import chainlit as cl
 import locale
 from config import CONFIG
+from literalai import LiteralClient
+
+lai = LiteralClient(api_key="lsk_Za7jwDIUEszFc9vXyBOB99Qkz5wfRkGeRwiYcff0")
+lai.instrument_openai()
 
 fetch_and_cache_jira_issues()
 
