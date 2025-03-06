@@ -1,4 +1,4 @@
-from smolagents.agents import ToolCallingAgent
+from smolagents import ToolCallingAgent
 from agent_tools.create_jira_issue_tool import CreateJiraIssueTool
 from agent_tools.get_jira_issues_tool import GetJiraIssuesTool
 from models.openai_model import openai_model
@@ -9,8 +9,6 @@ create_jira_issue_tool=CreateJiraIssueTool()
 jira_issues_agent = ToolCallingAgent(
     model=openai_model,
         tools=[get_all_jira_issues_tool, create_jira_issue_tool],
-        name='Jira issue agent',  # This parameter is not supported in ToolCallingAgent
-        description='an agent for Jira issues',  # This parameter is not supported in ToolCallingAgent
         add_base_tools=False
 )
 
