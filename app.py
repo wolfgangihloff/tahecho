@@ -1,5 +1,6 @@
 from openai import OpenAI
 from agents.jira_issues_agent import process_user_request
+from agents.manager_agent import execute_multiagent
 from cache import fetch_and_cache_jira_issues
 import chainlit as cl
 import locale
@@ -27,7 +28,8 @@ When users ask about their Jira issues or tasks, you can use the get_my_jira_iss
 client = OpenAI(api_key=CONFIG["OPENAI_API_KEY"])
 
 async def call_jira_agent(query: any):
-    response = process_user_request(query)
+    #response = process_user_request(query)
+    response = execute_multiagent(query)
     return response
 
 functions = [

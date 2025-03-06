@@ -9,6 +9,8 @@ create_jira_issue_tool=CreateJiraIssueTool()
 jira_issues_agent = ToolCallingAgent(
     model=openai_model,
         tools=[get_all_jira_issues_tool, create_jira_issue_tool],
+        name='Jira issue agent',  # This parameter is not supported in ToolCallingAgent
+        description='an agent for Jira issues',  # This parameter is not supported in ToolCallingAgent
         add_base_tools=False
 )
 
