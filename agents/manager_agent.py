@@ -1,5 +1,5 @@
 from smolagents.agents import CodeAgent
-from agents import jira_issues_agent
+from agents.jira_issues_agent import jira_issues_agent
 from models import openai_model
 
 manager_agent = CodeAgent(

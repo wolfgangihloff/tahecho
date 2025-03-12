@@ -8,10 +8,8 @@ create_jira_issue_tool=CreateJiraIssueTool()
 
 jira_issues_agent = ToolCallingAgent(
     model=openai_model,
-    tools=[get_all_jira_issues_tool, create_jira_issue_tool],
-    add_base_tools=False,
-    name="jira_issues_agent",
-    description="Get and creates all Jira issues.",
+        tools=[get_all_jira_issues_tool, create_jira_issue_tool],
+        add_base_tools=False
 )
 
 def process_user_request(user_input):
