@@ -1,6 +1,6 @@
 from openai import OpenAI
-from agents.jira_issues_agent import process_user_request
 from agents.manager_agent import execute_multiagent
+from agents.manager_agent import manager_agent
 from cache import fetch_and_cache_jira_issues
 import chainlit as cl
 import locale
@@ -98,7 +98,7 @@ async def main(message: cl.Message):
     # Add assistant's response to history
     messages.append({"role": "assistant", "content": response_message.content})
     """
-    response = process_user_request(message.content)  
+    response = execute_multiagent(message.content)  
     await cl.Message(content=response).send()
     # Add assistant's response to history
     messages.append({"role": "assistant", "content": response})

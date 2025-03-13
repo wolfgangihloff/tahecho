@@ -8,9 +8,13 @@ create_jira_issue_tool=CreateJiraIssueTool()
 
 jira_issues_agent = ToolCallingAgent(
     model=openai_model,
-        tools=[get_all_jira_issues_tool, create_jira_issue_tool],
-        add_base_tools=False
+    tools=[get_all_jira_issues_tool, create_jira_issue_tool],
+    add_base_tools=False,
+    max_steps=2
 )
+
+jira_issues_agent.name = "jira_issues_agent"
+jira_issues_agent.description = "Get and creates all Jira issues."
 
 def process_user_request(user_input):
     """Agent decides what to do based on user input."""
