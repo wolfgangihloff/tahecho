@@ -1,3 +1,4 @@
+import json
 from openai import OpenAI
 from agents.manager_agent import execute_multiagent
 from agents.manager_agent import manager_agent
@@ -102,6 +103,5 @@ async def main(message: cl.Message):
     await cl.Message(content=response).send()
     # Add assistant's response to history
     messages.append({"role": "assistant", "content": response})
-    
     # Update the chat history in the session
     cl.user_session.set("messages", messages)
