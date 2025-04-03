@@ -2,7 +2,8 @@ import json
 from openai import OpenAI
 from agents.manager_agent import execute_multiagent
 from agents.manager_agent import manager_agent
-from cache import fetch_and_cache_jira_issues
+from cache import fetch_and_cache_jira_issues, get_cached_jira_issues
+from py2neo import Graph
 import chainlit as cl
 import locale
 from config import CONFIG
@@ -56,6 +57,34 @@ functions = [
 
 @cl.on_chat_start
 async def start():
+    
+    uri = "bolt://localhost:7687"
+    graph = Graph(uri, auth=("neo4j", "test1234"))
+    
+    for issue in get_cached_jira_issues():
+        key = issue.get("key", "")
+        summary = issue.get("summary", "")
+        link = issue.get("self", "")
+        description = issue.get("description", "")
+        
+        cypher_query = """
+        MERGE (i:Issue { key: $key })
+        ON CREATE SET i.summary = $summary,
+                  i.link = $link,
+                  i.description = $description
+        ON MATCH SET  i.summary = $summary,
+                  i.link = $link,
+                  i.description = $description
+        """
+        
+        graph.run(cypher_query, 
+              key=key,
+              summary=summary,
+              link=link,
+              description=description)
+    
+    print("¡Issues insertadas/actualizadas en Neo4j!")
+    
     # Initialize chat with system message
     cl.user_session.set("messages", [
         {"role": "system", "content": SYSTEM_MESSAGE}
@@ -75,31 +104,8 @@ async def main(message: cl.Message):
     
     # Add user message to history
     messages.append({"role": "user", "content": message.content})
-    """
-    response = client.chat.completions.create(
-        model="gpt-4o",
-        messages=messages,
-        functions=functions,
-        function_call="auto",
-    )
 
-    response_message = response.choices[0].message
-    
-    if response_message.function_call:
-        function_args = json.loads(response_message.function_call.arguments)
-        print(function_args)
-        print(function_args["query"])
-        jira_response = await call_jira_agent(function_args["query"])
-        
-        messages.append({"role": "assistant", "content": jira_response})
-        await cl.Message(content=jira_response).send()
-        return
-    
-    await cl.Message(content=response_message.content).send()
-    # Add assistant's response to history
-    messages.append({"role": "assistant", "content": response_message.content})
-    """
-    response = execute_multiagent(message.content)  
+    response = await execute_multiagent(message.content)
     await cl.Message(content=response).send()
     # Add assistant's response to history
     messages.append({"role": "assistant", "content": response})

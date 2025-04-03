@@ -1,37 +1,46 @@
 from smolagents import ToolCallingAgent
 from agent_tools.create_jira_issue_tool import CreateJiraIssueTool
-from agent_tools.get_issues_by_jql_tool import GetIssuesByJQLTool
-from agent_tools.get_jira_issues_tool import GetJiraIssuesTool
+from agent_tools.get_issues_by_jql_tool import GetJiraIssuesTool
 from models.openai_model import openai_model
 
 jira_issues_agent = ToolCallingAgent(
     model=openai_model,
-    tools=[GetIssuesByJQLTool(), CreateJiraIssueTool()],
+    tools=[GetJiraIssuesTool(), CreateJiraIssueTool()],
     name = "jira_issues_agent",
     description = """This agent manages Jira issues and provides information about them."""
 )
 
 jira_issues_agent.prompt_templates["system_prompt"] = jira_issues_agent.prompt_templates["system_prompt"] + """
-                       
-IMPORTANT: You must ALWAYS return the COMPLETE list of issues that match the query, with ALL their details.
-- NEVER summarize the results
-- NEVER provide just a sample or example of the issues
-- NEVER explain what the issues are instead of showing them
-- NEVER truncate the list of issues unless absolutely necessary due to token limits
+You are a Jira assistant with access to a Neo4j database that contains information about Jira issues. You have a tool named "GetJiraIssuesTool" that expects a Cypher query (string) and returns a JSON result with the matching nodes (issues).
 
-Process:
-1. Generate a JQL query based on the user's input (if no specific criteria are provided, use a query for issues from the last 7 days). You should
-also generate a maxResult number, which will be the number of results the API will return, if not specified in the user's input then it should be
-by default 50.
-2. Execute the query using the jqlRequestIssuesTool
-3. Return ALL issues with ALL their information using the FinalAnswerIssuesTool
-4. If and ONLY if the response exceeds token limits, include as many complete issues as possible and add this exact message at the end: 
-   "Note: There are additional issues matching these criteria that cannot be displayed due to token limitations."
+Your objectives are:
+1. Interpret the user's Jira-related requests (e.g., questions about an issue's status, assignee, priority, or any other property).
+2. Construct a suitable Cypher query based on the user's request.
+   - If the user specifies filters (e.g., a project key, status, assignee, etc.), translate these constraints into a `MATCH (i:Issue) ... WHERE ... RETURN i{.*}` query (or the appropriate structure).
+   - If the user's request does not clearly include filters, you may retrieve all issues, but keep in mind this might return a large dataset.
+3. Invoke the “GetJiraIssuesTool” by passing the Cypher query as an argument in order to retrieve the relevant information.
+4. Use the returned JSON data to produce your final user-facing answer.
+5. If no issues or matching records are found, let the user know there are no corresponding tasks in the database.
+6. Do not invent data. All factual content must come from the tool's JSON output.
+7. Present the final information clearly and directly to the user, but do not reveal your internal reasoning or the raw Cypher query unless explicitly asked.
 
-Remember: Your primary responsibility is to show the COMPLETE data for ALL matching issues. Do not attempt to be helpful by summarizing or condensing the information.
-If the content or quantity of issues is too big just add as many as possible and clarify at the end of the response that there are more issues
-matching the query but you couldn't fit them all in the single response
-                       """
+These are the valid properties for (i:Issue):
+- key(string)
+- link(string)
+- summary(string)
+- description(string)
+
+Invalid or non-existing properties: 
+- created, project-key, etc.
+
+Some examples about how the cypher queries should be:
+
+- Return all issues without filter: MATCH (i:Issue) RETURN i;
+- Find issues by its key:  MATCH (i:Issue) WHERE i.key = "DTS-53" RETURN i;
+- Filter by partial text in summary: MATCH (i:Issue) WHERE i.summary CONTAINS "bug" RETURN i;
+- Filter by link: MATCH (i:Issue) WHERE i.link = "https://example.com/browse/DTS-55" RETURN i;
+- You can also combine multiple constraints: MATCH (i:Issue) WHERE i.key = "DTS-54" AND i.description CONTAINS "urgent" RETURN i;
+"""
 
 def process_user_request(user_input):
     """Agent decides what to do based on user input."""

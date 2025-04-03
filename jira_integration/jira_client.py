@@ -20,6 +20,8 @@ class JiraClient:
     
     def get_all_jira_issues(self):
         """Obtiene todas las issues de Jira."""
+        
+        
         try:
             jql = "ORDER BY created DESC"
             issues = self.instance.jql(jql)

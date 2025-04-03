@@ -26,6 +26,7 @@ httpx==0.28.1
 huggingface-hub==0.28.1
 idna==3.10
 importlib_metadata==8.5.0
+interchange==2021.0.4
 Jinja2==3.1.5
 jiter==0.8.2
 jmespath==1.0.1
@@ -37,7 +38,9 @@ markdownify==0.14.1
 MarkupSafe==3.0.2
 marshmallow==3.26.0
 mdurl==0.1.2
+monotonic==1.6
 mypy-extensions==1.0.0
+neo4j==5.28.1
 nest-asyncio==1.6.0
 numpy==2.2.2
 oauthlib==3.2.2
@@ -53,9 +56,11 @@ opentelemetry-sdk==1.29.0
 opentelemetry-semantic-conventions==0.50b0
 packaging==24.2
 pandas==2.2.3
+pansi==2024.11.0
 pillow==11.1.0
 primp==0.11.0
 protobuf==5.29.3
+py2neo==2021.2.4
 pydantic==2.10.1
 pydantic_core==2.27.1
 Pygments==2.19.1
