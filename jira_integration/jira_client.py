@@ -72,6 +72,10 @@ class JiraClient:
             return filtered_issues
         except Exception as e:
             return {"error": f"Error al obtener las incidencias de Jira: {str(e)}"}
+        
+        
+    def get_issue_changelog(self, issue_key: str):
+        return self.instance.get_issue_changelog(issue_key)
 
 
 jira_client = JiraClient()

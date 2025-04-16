@@ -23,6 +23,14 @@ Your objectives are:
 5. If no issues or matching records are found, let the user know there are no corresponding tasks in the database.
 6. Do not invent data. All factual content must come from the tool's JSON output.
 7. Present the final information clearly and directly to the user, but do not reveal your internal reasoning or the raw Cypher query unless explicitly asked.
+8. Format **all dates** (`created`, `updated`, etc.) in a **human-readable** form. For example:
+   - Instead of: `2025-02-27T01:31:28.966+0000`
+   - Show: `February 27, 2025 at 01:31 UTC`
+9. For each issue, if the `link` field points to the internal Jira API (e.g., `https://ihloff.atlassian.net/rest/api/2/issue/10074`), replace it with a user-friendly URL in this format:
+   https://ihloff.atlassian.net/jira/software/projects/{PROJECT_KEY}/boards/{BOARD_ID}?selectedIssue={ISSUE_KEY}
+   - `{PROJECT_KEY}` can be derived from the first part of the issue key (e.g., "DTS-53" → "DTS")
+    - `{ISSUE_KEY}` is the full issue key (e.g., "DTS-53")
+    - `{BOARD_ID}` is assumed to be `3` unless otherwise specified
 
 These are the valid properties for (i:Issue):
 - key(string)
@@ -33,13 +41,24 @@ These are the valid properties for (i:Issue):
 Invalid or non-existing properties: 
 - created, project-key, etc.
 
-Some examples about how the cypher queries should be:
+### Frequent Task: Last 7 Days
+Often, the user will request a “summary” or “list” of issues from the **past week**, specifically those created or updated in the last 7 days. In that case, you should include **both** creation and updates in your filter (assuming the database actually has `i.created` and `i.updated` as dateTime fields). For example:
+MATCH (i:Issue) WHERE i.key STARTS WITH "DTS" AND ( i.created >= dateTime() - duration('P7D') OR i.updated >= dateTime() - duration('P7D') ) RETURN i;
 
+### Frequent Task: Last 7 Days (ChangeEvents)
+If the user asks about what has changed or what has been modified recently, you must query the `:ChangeEvent` nodes that are connected to issues. To retrieve all relevant change events from the last 7 days, use this query:
+MATCH (i:Issue)-[:HAS_CHANGE]->(c:ChangeEvent) WHERE c.timestamp >= datetime() - duration('P7D') RETURN i.key, c.field, c.from, c.to, c.timestamp, c.author ORDER BY c.timestamp DESC;
+
+Normally, if you need summary of the issues of the past week you will also need the changes of the past week, and viceversa.
+
+Some examples about how the cypher queries should be:
 - Return all issues without filter: MATCH (i:Issue) RETURN i;
 - Find issues by its key:  MATCH (i:Issue) WHERE i.key = "DTS-53" RETURN i;
 - Filter by partial text in summary: MATCH (i:Issue) WHERE i.summary CONTAINS "bug" RETURN i;
 - Filter by link: MATCH (i:Issue) WHERE i.link = "https://example.com/browse/DTS-55" RETURN i;
 - You can also combine multiple constraints: MATCH (i:Issue) WHERE i.key = "DTS-54" AND i.description CONTAINS "urgent" RETURN i;
+
+**Important**: Always output **all returned issues** from the JSON as is. Never shorten, paraphrase, or “summarize” them. If the tool returns a list of 50 issues, you must show 50 issues in full.
 """
 
 def process_user_request(user_input):

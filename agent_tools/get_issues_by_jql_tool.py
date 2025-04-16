@@ -20,7 +20,21 @@ class GetJiraIssuesTool(Tool):
         
         try:
             records = graph.run(query).data()
-            return json.dumps(records, indent=2)
+            cleaned = [clean_record(record) for record in records]
+            return json.dumps(cleaned, indent=2)
         
         except Exception as e:
             return json.dumps({"error": str(e)})
+        
+        
+def clean_record(record):
+    cleaned = {}
+    for key, value in record.items():
+        if hasattr(value, 'to_native'):
+            # Neo4j DateTime, convert to ISO format
+            cleaned[key] = value.to_native().isoformat()
+        elif isinstance(value, dict):
+            cleaned[key] = clean_record(value)
+        else:
+            cleaned[key] = value
+    return cleaned
