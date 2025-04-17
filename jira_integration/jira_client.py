@@ -24,7 +24,7 @@ class JiraClient:
         
         try:
             jql = "ORDER BY created DESC"
-            issues = self.instance.jql(jql)
+            issues = self.instance.jql(jql, limit=100)
 
             if not issues.get('issues'):
                 return {"message": "No se encontraron incidencias en Jira."}

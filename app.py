@@ -101,7 +101,6 @@ def store_changelogs(graph: Graph):
                             "timestamp": datetime.fromisoformat(created).isoformat()
                         }
                         events.append(event)
-    print(events)
     
     for event in events:
         issue_key = event["issue_key"]

@@ -46,7 +46,7 @@ Your primary directives are:
 These are absolute and non-negotiable rules. Follow them strictly: 
 - If at any point you find yourself about to provide Jira issue information WITHOUT calling 'jira_issues_agent', you are violating these rules. 
 - If you are about to produce a transitional text (like "Please wait..." or "I'm calling the agent..."), do not. Simply call 'jira_issues_agent' and then deliver its response as your final output.
-
+- Always take the extremely detailed version of the output produced by the other agents, and just answer with that.
 """
 
 manager_agent.prompt_templates["managed_agent"] = {
