@@ -138,7 +138,7 @@ def store_changelogs(graph: Graph):
 @cl.on_chat_start
 async def start():
     
-    uri = "bolt://neo4j:7687"
+    uri = "bolt://localhost:7687"
     graph = Graph(uri, auth=("neo4j", "test1234"))
     """
     driver = GraphDatabase.driver(uri, auth=("neo4j", "test1234"))
@@ -157,7 +157,6 @@ async def start():
         created = issue.get("created", "")
         updated = issue.get("updated", "")
         issue_links = issue.get("issueLinks", "")
-        
         cypher_query = """
         MERGE (i:Issue { key: $key })
         ON CREATE SET i.summary = $summary,
