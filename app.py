@@ -21,6 +21,7 @@ from jira_integration.jira_client import jira_client
 lai = LiteralClient(api_key="lsk_Za7jwDIUEszFc9vXyBOB99Qkz5wfRkGeRwiYcff0")
 lai.instrument_openai()
 
+
 fetch_and_cache_jira_issues()
 
 # System message to set the context
@@ -137,7 +138,7 @@ def store_changelogs(graph: Graph):
 @cl.on_chat_start
 async def start():
     
-    uri = "bolt://localhost:7687"
+    uri = "bolt://neo4j:7687"
     graph = Graph(uri, auth=("neo4j", "test1234"))
     """
     driver = GraphDatabase.driver(uri, auth=("neo4j", "test1234"))
@@ -155,6 +156,7 @@ async def start():
         description = issue.get("description", "")
         created = issue.get("created", "")
         updated = issue.get("updated", "")
+        issue_links = issue.get("issueLinks", "")
         
         cypher_query = """
         MERGE (i:Issue { key: $key })
@@ -178,6 +180,17 @@ async def start():
               created = created,
               updated = updated
               )
+        
+        cypher_blocks_query = """
+        MERGE (a:Issue { key: $from_key })
+        MERGE (b:Issue { key: $to_key })
+        MERGE (a)-[:BLOCKS]->(b)
+        """
+        for blocker_key in issue_links.get("inwardIssue", {}).get("blocker_keys", []):
+            graph.run(cypher_blocks_query, from_key=blocker_key, to_key=key)
+        
+        for blocked_key in issue_links.get("outwardIssue", {}).get("blocked_keys", []):
+            graph.run(cypher_blocks_query, from_key=key, to_key=blocked_key)
     
     print("¡Issues insertadas/actualizadas en Neo4j!")
     store_changelogs(graph)

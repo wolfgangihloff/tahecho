@@ -1,4 +1,4 @@
-aiofiles==24.1.0
+aiofiles==23.2.1
 aiolimiter==1.2.1
 annotated-types==0.7.0
 anyio==4.8.0
@@ -47,13 +47,13 @@ fsspec==2024.12.0
 future==1.0.0
 gensim==4.3.3
 googleapis-common-protos==1.66.0
-graphrag==2.1.0
 graspologic==3.4.1
 graspologic-native==1.2.5
 grpcio==1.70.0
 h11==0.14.0
 httpcore==1.0.7
 httpx==0.28.1
+httpx-sse==0.4.0
 huggingface-hub==0.28.1
 hyppo==0.4.0
 idna==3.10
@@ -65,6 +65,7 @@ jiter==0.8.2
 jmespath==1.0.1
 joblib==1.4.2
 json_repair==0.39.1
+jsonref==1.1.0
 kiwisolver==1.4.8
 lancedb==0.17.0
 langcodes==3.5.0
@@ -79,6 +80,8 @@ markdownify==0.14.1
 MarkupSafe==3.0.2
 marshmallow==3.26.0
 matplotlib==3.10.1
+mcp==1.6.0
+mcpadapt==0.1.3
 mdurl==0.1.2
 monotonic==1.6
 msal==1.32.0
@@ -117,6 +120,7 @@ py2neo==2021.2.4
 pyarrow==15.0.2
 pycparser==2.22
 pydantic==2.11.3
+pydantic-settings==2.9.1
 pydantic_core==2.33.1
 Pygments==2.19.1
 PyJWT==2.10.1
@@ -143,13 +147,14 @@ shellingham==1.5.4
 simple-websocket==1.1.0
 six==1.17.0
 smart-open==7.1.0
-smolagents==1.10.0
+smolagents==1.14.0
 sniffio==1.3.1
 soupsieve==2.6
 spacy==3.8.5
 spacy-legacy==3.0.12
 spacy-loggers==1.0.5
 srsly==2.5.1
+sse-starlette==2.2.1
 starlette==0.41.3
 statsmodels==0.14.4
 syncer==2.0.3

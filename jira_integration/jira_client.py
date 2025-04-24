@@ -24,7 +24,7 @@ class JiraClient:
         
         try:
             jql = "ORDER BY created DESC"
-            issues = self.instance.jql(jql, limit=100)
+            issues = self.instance.jql(jql, limit=9999)
 
             if not issues.get('issues'):
                 return {"message": "No se encontraron incidencias en Jira."}
@@ -32,6 +32,22 @@ class JiraClient:
 
             filtered_issues = []
             for issue in issues["issues"]:
+                inward_keys = [
+                    link["inwardIssue"]["key"]
+                    for link in issue["fields"].get("issuelinks", [])
+                    if "inwardIssue" in link
+                ]
+                outward_keys = [
+                    link["outwardIssue"]["key"]
+                    for link in issue["fields"].get("issuelinks", [])
+                    if "outwardIssue" in link
+                ]
+                issue_links = {}
+                if inward_keys:
+                    issue_links["inwardIssue"] = {"blocker_keys": inward_keys}
+                if outward_keys:
+                    issue_links["outwardIssue"] = {"blocked_keys": outward_keys}
+                            
                 filtered_issue = {
                     "id": issue.get("id"),
                     "key": issue.get("key"),
@@ -66,6 +82,7 @@ class JiraClient:
                     "resolutiondate": issue["fields"].get("resolutiondate"),
                     "duedate": issue["fields"].get("duedate"),
                     "labels": issue["fields"].get("labels", []),
+                    "issueLinks": issue_links,
                 }
                 filtered_issues.append(filtered_issue)
 
