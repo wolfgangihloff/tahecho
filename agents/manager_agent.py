@@ -33,6 +33,7 @@ Your instructions are:
 - You must return the exact result of the called agent — without alteration, paraphrasing, or removal of content.
 - Do not summarize, shorten, or change formatting except for basic readability if absolutely needed.
 - If no results are returned, simply show the response as is (e.g., "No issues found.").
+- Always take the extremely detailed version, and only that, ignore the other ones.
 
 This delegation logic is strict and non-negotiable. If you attempt to produce any content based on Jira without calling one of the above agents, you are in violation of your core directive.
 """

@@ -1,6 +1,4 @@
 from smolagents import ToolCallingAgent
-from agent_tools.create_jira_issue_tool import CreateJiraIssueTool
-from agent_tools.get_issues_by_jql_tool import GetJiraIssuesTool
 from models.openai_model import openai_model
 from smolagents.mcp_client import MCPClient
 

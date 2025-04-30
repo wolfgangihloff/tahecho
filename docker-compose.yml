@@ -8,6 +8,8 @@ services:
       - NEO4J_AUTH=neo4j/test1234
     volumes:
       - neo4j_data:/data
+    networks:
+      - internal_net
 
   mcp:
     image: ghcr.io/sooperset/mcp-atlassian:latest
@@ -25,6 +27,9 @@ services:
       - JIRA_INSTANCE_URL=${JIRA_INSTANCE_URL}
       - JIRA_USERNAME=${JIRA_USERNAME}
       - JIRA_API_TOKEN=${JIRA_API_TOKEN}
+    networks:
+      - internal_net
+
 
   chainlit-app:
     build: .
@@ -35,6 +40,12 @@ services:
     depends_on:
       - neo4j
       - mcp
+    networks:
+      - internal_net
 
 volumes:
   neo4j_data:
+
+networks:
+  internal_net:
+    driver: bridge

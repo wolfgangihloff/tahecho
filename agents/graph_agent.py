@@ -1,11 +1,10 @@
 from smolagents import ToolCallingAgent
-from agent_tools.create_jira_issue_tool import CreateJiraIssueTool
-from agent_tools.get_issues_by_jql_tool import GetJiraIssuesTool
+from agent_tools.get_jira_issues_tool import GetJiraIssuesTool
 from models.openai_model import openai_model
 
 graph_agent = ToolCallingAgent(
     model=openai_model,
-    tools= [CreateJiraIssueTool(), GetJiraIssuesTool()],
+    tools= [GetJiraIssuesTool()],
     name = "graph_agent",
     description = """This agent connects to a neo4j database to get more complex information about Jira issues."""
 )
