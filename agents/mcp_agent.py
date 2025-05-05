@@ -8,7 +8,7 @@ jira_tool = mcp_client.get_tools()
 mcp_agent = ToolCallingAgent(
     model=openai_model,
     tools=jira_tool,
-    name = "jira_issues_agent",
+    name = "mcp_agent",
     description = """This agent connects to a atlassian mcp server and perform actions jira related."""
 )
 

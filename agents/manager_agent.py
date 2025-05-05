@@ -200,20 +200,105 @@ Here is a list of the team members that you can call:
 Only add commentary or alter or rewrite the tool's response to display the message in a more natural language or a prettier way, but never change the meaning or purpose of the response.
 Now begin!
 """
+manager_agent.prompt_templates["planning"] = {
+  "plan": (
+    """
+    You are a planning expert tasked with preparing a Jira-related task for execution.
+
+    First, survey what you know:
+    ### 1.1. Facts from the task
+    ### 1.2. Facts to look up
+    ### 1.3. Facts to derive via reasoning
+
+    Then create a high-level execution plan (without calling tools directly):
+    ### 2. Plan:
+    Each step must correspond to a task that one of your agents can perform.
+    Write `<end_plan>` after your final step.
+
+    Your tools:
+    {%- for tool in tools.values() %}
+    - {{ tool.name }}: {{ tool.description }}
+    {%- endfor %}
+
+    Your team:
+    {%- for agent in managed_agents.values() %}
+    - {{ agent.name }}: {{ agent.description }}
+    {%- endfor %}
+
+    Task:
+    ```
+    {{task}}
+    ```    
+    """
+  ),
+  "update_plan_pre_messages": (
+    """
+    You are a planning expert re-evaluating the strategy for a Jira task.
+    Task:
+    ```
+    {{task}}
+    ```
+
+    You will review the task and previous attempts, and update the plan accordingly.    
+    """
+  ),
+  "update_plan_post_messages": (
+    """
+    Update your facts:
+    ### 1.1. Facts from task
+    ### 1.2. Facts we have learned
+    ### 1.3. Remaining things to look up
+    ### 1.4. Things to derive
+
+    Then update the plan (no tool calls yet):
+    ### 2. Plan
+
+    You have {{remaining_steps}} steps remaining. End with `<end_plan>`.
+    Available tools:
+    {%- for tool in tools.values() %}
+    - {{ tool.name }}: {{ tool.description }}
+    {%- endfor %}
+
+    Team:
+    {%- for agent in managed_agents.values() %}
+    - {{ agent.name }}: {{ agent.description }}
+    {%- endfor %}    
+    """
+  )
+}
 
 
 manager_agent.prompt_templates["managed_agent"] = {
-        "task": (
-            "You are a helper agent. The manager has given you this task:\n"
-            "{{task}}\n"
-            "If it involves Jira, you MUST call the appropriate tools or return data accordingly.\n"
-            "Do not hallucinate or invent content. Respond with a clear and complete final answer."
-        ),
-        "report": (
-            "Final answer from this managed agent:\n"
-            "{{final_answer}}"
-        ),
-    }
+  "task": (
+    """You are '{{name}}', a specialist agent responsible for a part of the Jira system.
+    Your manager has given you this task:
+    {{task}}
+
+    Solve it as completely as possible.
+
+    Your answer MUST contain:
+    ### 1. Task outcome (short version):
+    ### 2. Task outcome (extremely detailed version):
+    ### 3. Additional context (if relevant):
+
+    Place everything inside your `final_answer` tool call. Anything not inside that will be lost.
+    """
+  ),
+  "report": (
+    "Final answer from this managed agent:\n"
+    "{{final_answer}}"
+  ),
+}
+
+manager_agent.prompt_templates["final_answer"] = {
+  "pre_messages": (
+    "An agent failed to complete the task. Based on its memory, you must provide an answer."
+  ),
+  "post_messages": (
+    """Now, using the context above, answer the user task:
+    {{task}}"""
+  )
+}
 
 
 
