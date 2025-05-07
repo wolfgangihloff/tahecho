@@ -13,22 +13,25 @@ You can ask the bot things as:
 
 
 ## Setup and Installation
-* rm -rf .venv
-* python3.12 -m venv .venv
-* source .venv/bin/activate
-* pip install -r requirements.txt
-* setup .env file based on .env.example
-** for Jira, find here: https://id.atlassian.com/manage-profile/security/api-tokens
+### Using Docker
+
+1. Make sure you have Docker and Docker Compose installed on your system
+2. Clone this repository
+3. Create a `.env` file based on `.env.example`
+   * For Jira API tokens, go to: https://id.atlassian.com/manage-profile/security/api-tokens
+4. Build and start the Docker container:
+   ```bash
+   docker compose up --build
+   ```
 
 ## Running the Application
 
-To start the Chainlit application:
+The application will be automatically started when using Docker and will be available at http://localhost:8000
 
+To stop the application:
 ```bash
-chainlit run app.py
+docker compose down
 ```
-
-The application will be available at http://localhost:8000
 
 ## License
 
