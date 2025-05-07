@@ -2,7 +2,7 @@ from smolagents import ToolCallingAgent
 from models.openai_model import openai_model
 from smolagents.mcp_client import MCPClient
 
-mcp_client = MCPClient({"url": "http://localhost:8002/sse"})
+mcp_client = MCPClient({"url": "http://mcp:8002/sse"})
 jira_tool = mcp_client.get_tools()
 
 mcp_agent = ToolCallingAgent(

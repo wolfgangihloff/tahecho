@@ -304,7 +304,6 @@ manager_agent.prompt_templates["final_answer"] = {
 
 async def execute_multiagent(user_input: str) -> str:
     loop = asyncio.get_event_loop()
-    # run_in_executor() pushes the sync call to a thread so it won't block the event loop
     result = await loop.run_in_executor(
         None,
         lambda: manager_agent.run(user_input, reset=False)

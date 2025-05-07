@@ -14,7 +14,7 @@ class GetJiraIssuesTool(Tool):
     output_type = "string"
     
     def forward(self, query: str):
-        uri = "bolt://localhost:7687"
+        uri = "bolt://neo4j:7687"
         graph = Graph(uri, auth=("neo4j", "test1234"))
         
         try:

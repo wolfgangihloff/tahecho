@@ -31,7 +31,7 @@ client = OpenAI(api_key=CONFIG["OPENAI_API_KEY"])
 @cl.on_chat_start
 async def start():
     
-    uri = "bolt://localhost:7687"
+    uri = "bolt://neo4j:7687"
     graph = Graph(uri, auth=("neo4j", "test1234"))
     """
     driver = GraphDatabase.driver(uri, auth=("neo4j", "test1234"))
