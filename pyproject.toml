@@ -1,0 +1,78 @@
+[tool.poetry]
+name = "tahecho"
+version = "0.1.0"
+description = "AI-powered Jira assistant using LangChain, LangGraph, and Neo4j"
+authors = ["Wolfgang Ihloff <wolfgang.ihloff@example.com>"]
+readme = "Readme.md"
+packages = [{include = "tahecho", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+# Core LangChain dependencies
+langchain = {extras = ["openai"], version = "^0.3.0"}
+langchain-community = "^0.3.0"
+langchain-core = "^0.3.0"
+langgraph = "0.5.3"
+
+# Web framework
+chainlit = "^2.0.602"
+
+# Database
+py2neo = "*"
+neo4j = "*"
+
+# Jira integration
+atlassian-python-api = "*"
+
+# OpenAI
+openai = "*"
+
+# Utilities
+python-dotenv = "*"
+pytz = "*"
+networkx = "*"
+
+# Monitoring/Logging
+literalai = "*"
+
+[tool.poetry.group.dev.dependencies]
+# Testing
+pytest = "*"
+pytest-cov = "*"
+pytest-mock = "*"
+pytest-asyncio = "*"
+pytest-watch = "*"
+coverage = "*"
+
+# Code quality
+black = "*"
+isort = "*"
+flake8 = "*"
+mypy = "*"
+pre-commit = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
+target-version = ['py311']
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --cov=src --cov-report=term-missing --cov-report=html"
+asyncio_mode = "auto"

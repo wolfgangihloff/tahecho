@@ -1,31 +1,20 @@
 import json
-from smolagents import Tool
+from langchain_core.tools import Tool
 from py2neo import Graph
 
-class GetJiraIssuesTool(Tool):
-    name = "get_jira_issues"
-    description = "Return all the Jira issues of the site"
-    inputs = {
-        "query": {
-            "type": "string",
-            "description": "query to make the request to the neo4j database where the issues are stored"
-        }
-    }
-    output_type = "string"
+def get_jira_issues(query: str) -> str:
+    """Return all the Jira issues of the site"""
+    uri = "bolt://neo4j:7687"
+    graph = Graph(uri, auth=("neo4j", "test1234"))
     
-    def forward(self, query: str):
-        uri = "bolt://neo4j:7687"
-        graph = Graph(uri, auth=("neo4j", "test1234"))
-        
-        try:
-            records = graph.run(query).data()
-            cleaned = [clean_record(record) for record in records]
-            return json.dumps(cleaned, indent=2)
-        
-        except Exception as e:
-            return json.dumps({"error": str(e)})
-        
-        
+    try:
+        records = graph.run(query).data()
+        cleaned = [clean_record(record) for record in records]
+        return json.dumps(cleaned, indent=2)
+    
+    except Exception as e:
+        return json.dumps({"error": str(e)})
+
 def clean_record(record):
     cleaned = {}
     for key, value in record.items():
@@ -37,3 +26,9 @@ def clean_record(record):
         else:
             cleaned[key] = value
     return cleaned
+
+GetJiraIssuesTool = Tool(
+    name="get_jira_issues",
+    description="Return all the Jira issues of the site",
+    func=get_jira_issues
+)

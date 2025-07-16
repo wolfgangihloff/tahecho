@@ -1,5 +1,5 @@
 from openai import OpenAI
-from agents.manager_agent import execute_multiagent
+from agents.langchain_manager_agent import langchain_manager_agent
 from py2neo import Graph
 import chainlit as cl
 import locale
@@ -65,8 +65,16 @@ async def main(message: cl.Message):
     # Add user message to history
     messages.append({"role": "user", "content": message.content})
 
-    response = await execute_multiagent(message.content)
+    # Get conversation ID for persistence
+    conversation_id = cl.user_session.get("conversation_id")
+    if not conversation_id:
+        conversation_id = f"user_{cl.user_session.get('id', 'default')}"
+        cl.user_session.set("conversation_id", conversation_id)
+
+    # Execute the LangGraph workflow
+    response = langchain_manager_agent.run(message.content, conversation_id=conversation_id)
     await cl.Message(content=response).send()
+    
     # Add assistant's response to history
     messages.append({"role": "assistant", "content": response})
     # Update the chat history in the session
