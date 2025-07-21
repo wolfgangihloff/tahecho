@@ -1,118 +1,208 @@
 #!/usr/bin/env python3
 """
-Test script to diagnose Tahecho setup issues
+Diagnostic script to test Tahecho setup and configuration.
+Tests both full mode (with Neo4j) and limited mode (without Neo4j).
 """
 
 import os
 import sys
 from dotenv import load_dotenv
 
-def test_env_vars():
-    """Test environment variables"""
-    print("🔍 Testing environment variables...")
+def test_environment_variables():
+    """Test required environment variables."""
+    print("🔍 Testing Environment Variables...")
+    
     load_dotenv()
     
-    required_vars = ["OPENAI_API_KEY"]
-    optional_vars = ["JIRA_INSTANCE_URL", "JIRA_USERNAME", "JIRA_API_TOKEN", "JIRA_CLOUD"]
+    required_vars = {
+        "OPENAI_API_KEY": "OpenAI API Key",
+        "JIRA_INSTANCE_URL": "Jira Instance URL", 
+        "JIRA_USERNAME": "Jira Username",
+        "JIRA_API_TOKEN": "Jira API Token"
+    }
+    
+    optional_vars = {
+        "GRAPH_DB_ENABLED": "Graph Database Enabled",
+        "NEO4J_URI": "Neo4j URI",
+        "NEO4J_USERNAME": "Neo4j Username", 
+        "NEO4J_PASSWORD": "Neo4j Password"
+    }
     
     missing_required = []
-    for var in required_vars:
-        if not os.getenv(var):
-            missing_required.append(var)
+    missing_optional = []
+    
+    for var, description in required_vars.items():
+        value = os.getenv(var)
+        if not value:
+            missing_required.append(f"❌ {description} ({var})")
+        else:
+            print(f"✅ {description}: {'*' * len(value)}")
+    
+    for var, description in optional_vars.items():
+        value = os.getenv(var)
+        if not value:
+            missing_optional.append(f"⚠️  {description} ({var}) - Optional")
+        else:
+            print(f"✅ {description}: {value}")
     
     if missing_required:
-        print(f"❌ Missing required environment variables: {missing_required}")
-        print("   Please set these in your .env file")
+        print("\n❌ Missing Required Environment Variables:")
+        for var in missing_required:
+            print(f"  {var}")
         return False
-    else:
-        print("✅ Required environment variables are set")
-    
-    # Check optional vars
-    missing_optional = []
-    for var in optional_vars:
-        if not os.getenv(var):
-            missing_optional.append(var)
     
     if missing_optional:
-        print(f"⚠️  Missing optional environment variables: {missing_optional}")
-        print("   Jira functionality will be limited")
-    else:
-        print("✅ All environment variables are set")
+        print("\n⚠️  Missing Optional Environment Variables:")
+        for var in missing_optional:
+            print(f"  {var}")
     
+    print("✅ Environment variables test completed")
     return True
 
-def test_langchain():
-    """Test LangChain setup"""
-    print("\n🔍 Testing LangChain setup...")
+def test_langchain_setup():
+    """Test LangChain 0.3.x setup."""
+    print("\n🔍 Testing LangChain Setup...")
+    
     try:
         from langchain.chat_models import init_chat_model
-        model = init_chat_model("gpt-4o-mini", model_provider="openai")
-        print("✅ LangChain setup successful")
+        from config import CONFIG
+        
+        # Test chat model initialization
+        llm = init_chat_model(
+            CONFIG["OPENAI_SETTINGS"]["model"],
+            model_provider="openai",
+            temperature=0.1
+        )
+        
+        # Test a simple completion
+        response = llm.invoke("Hello, this is a test message.")
+        print(f"✅ LangChain chat model working: {response.content[:50]}...")
         return True
+        
     except Exception as e:
-        print(f"❌ LangChain setup failed: {e}")
+        print(f"❌ LangChain setup failed: {str(e)}")
         return False
 
-def test_neo4j():
-    """Test Neo4j connection"""
-    print("\n🔍 Testing Neo4j connection...")
-    try:
-        from py2neo import Graph
-        # Try to connect to Neo4j
-        graph = Graph("bolt://localhost:7687", auth=("neo4j", "test1234"))
-        # Test a simple query
-        result = graph.run("RETURN 1 as test").data()
-        print("✅ Neo4j connection successful")
-        return True
-    except Exception as e:
-        print(f"❌ Neo4j connection failed: {e}")
-        print("   Make sure Neo4j is running at bolt://localhost:7687")
-        print("   You can start it with: docker run -d --name neo4j -p 7474:7474 -p 7687:7687 -e NEO4J_AUTH=neo4j/test1234 neo4j:latest")
-        return False
-
-def test_chainlit():
-    """Test Chainlit setup"""
-    print("\n🔍 Testing Chainlit setup...")
+def test_chainlit_setup():
+    """Test Chainlit setup."""
+    print("\n🔍 Testing Chainlit Setup...")
+    
     try:
         import chainlit as cl
-        print("✅ Chainlit setup successful")
+        print("✅ Chainlit import successful")
         return True
     except Exception as e:
-        print(f"❌ Chainlit setup failed: {e}")
+        print(f"❌ Chainlit setup failed: {str(e)}")
+        return False
+
+def test_graph_database():
+    """Test optional graph database connection."""
+    print("\n🔍 Testing Graph Database Connection...")
+    
+    try:
+        from utils.graph_db import graph_db_manager
+        
+        # Test connection
+        connected = graph_db_manager.connect()
+        
+        if connected:
+            print("✅ Neo4j connection successful")
+            print("✅ Running in FULL MODE - all features available")
+            return True
+        else:
+            print("⚠️  Neo4j not available")
+            print("✅ Running in LIMITED MODE - basic features only")
+            return True  # This is not an error, just limited functionality
+            
+    except Exception as e:
+        print(f"❌ Graph database test failed: {str(e)}")
+        return False
+
+def test_jira_integration():
+    """Test Jira integration."""
+    print("\n🔍 Testing Jira Integration...")
+    
+    try:
+        from jira_integration.jira_client import jira_client
+        
+        # Test basic Jira connection
+        issues = jira_client.get_all_jira_issues()
+        print(f"✅ Jira connection successful - found {len(issues)} issues")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Jira integration failed: {str(e)}")
+        return False
+
+def test_agent_setup():
+    """Test agent setup."""
+    print("\n🔍 Testing Agent Setup...")
+    
+    try:
+        from agents.langchain_manager_agent import langchain_manager_agent
+        from agents.langchain_mcp_agent import langchain_mcp_agent
+        from agents.langchain_graph_agent import langchain_graph_agent
+        
+        print("✅ All agents imported successfully")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Agent setup failed: {str(e)}")
         return False
 
 def main():
-    print("🚀 Tahecho Setup Diagnostic Tool\n")
+    """Run all diagnostic tests."""
+    print("🚀 Tahecho Setup Diagnostic")
+    print("=" * 50)
     
     tests = [
-        test_env_vars,
-        test_langchain,
-        test_chainlit,
-        test_neo4j,
+        ("Environment Variables", test_environment_variables),
+        ("LangChain Setup", test_langchain_setup),
+        ("Chainlit Setup", test_chainlit_setup),
+        ("Graph Database", test_graph_database),
+        ("Jira Integration", test_jira_integration),
+        ("Agent Setup", test_agent_setup)
     ]
     
     results = []
-    for test in tests:
+    
+    for test_name, test_func in tests:
         try:
-            result = test()
-            results.append(result)
+            result = test_func()
+            results.append((test_name, result))
         except Exception as e:
-            print(f"❌ Test failed with exception: {e}")
-            results.append(False)
+            print(f"❌ {test_name} test crashed: {str(e)}")
+            results.append((test_name, False))
     
-    print("\n" + "="*50)
-    print("📊 SUMMARY")
-    print("="*50)
+    # Summary
+    print("\n" + "=" * 50)
+    print("📊 Test Results Summary")
+    print("=" * 50)
     
-    if all(results):
+    passed = 0
+    total = len(results)
+    
+    for test_name, result in results:
+        status = "✅ PASS" if result else "❌ FAIL"
+        print(f"{status} {test_name}")
+        if result:
+            passed += 1
+    
+    print(f"\nOverall: {passed}/{total} tests passed")
+    
+    if passed == total:
         print("🎉 All tests passed! Your setup is ready.")
-        print("   You can now run: poetry run python app.py")
+        print("\nYou can now run:")
+        print("  chainlit run app.py")
+    elif passed >= 4:  # At least basic functionality works
+        print("⚠️  Basic functionality available, but some features may be limited.")
+        print("\nYou can still run:")
+        print("  chainlit run app.py")
     else:
-        print("⚠️  Some tests failed. Please fix the issues above before running the app.")
-        print("\n💡 Quick fixes:")
-        print("   1. Create a .env file with OPENAI_API_KEY")
-        print("   2. Start Neo4j: docker run -d --name neo4j -p 7474:7474 -p 7687:7687 -e NEO4J_AUTH=neo4j/test1234 neo4j:latest")
-        print("   3. Install dependencies: poetry install")
+        print("❌ Setup has issues. Please check the errors above.")
+        return 1
+    
+    return 0
 
 if __name__ == "__main__":
-    main() 
+    sys.exit(main()) 

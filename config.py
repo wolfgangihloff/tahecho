@@ -9,6 +9,10 @@ CONFIG = {
     "JIRA_USERNAME": os.getenv("JIRA_USERNAME"),
     "JIRA_API_TOKEN": os.getenv("JIRA_API_TOKEN"),
     "JIRA_CLOUD": os.getenv("JIRA_CLOUD", "True").lower() == "true",
+    "GRAPH_DB_ENABLED": os.getenv("GRAPH_DB_ENABLED", "True").lower() == "true",
+    "NEO4J_URI": os.getenv("NEO4J_URI", "bolt://neo4j:7687"),
+    "NEO4J_USERNAME": os.getenv("NEO4J_USERNAME", "neo4j"),
+    "NEO4J_PASSWORD": os.getenv("NEO4J_PASSWORD", "test1234"),
     "OPENAI_SETTINGS": {
         "model": "gpt-4o",
         "temperature": 0.7,

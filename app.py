@@ -1,11 +1,16 @@
 from openai import OpenAI
 from agents.langchain_manager_agent import langchain_manager_agent
-from py2neo import Graph
 import chainlit as cl
 import locale
+import logging
 from config import CONFIG
 from literalai import LiteralClient
 from utils.utils import store_changelogs, store_issues
+from utils.graph_db import graph_db_manager
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 lai = LiteralClient(api_key="lsk_Za7jwDIUEszFc9vXyBOB99Qkz5wfRkGeRwiYcff0")
 lai.instrument_openai()
@@ -30,20 +35,22 @@ client = OpenAI(api_key=CONFIG["OPENAI_API_KEY"])
 
 @cl.on_chat_start
 async def start():
+    # Attempt to connect to graph database
+    graph_connected = graph_db_manager.connect()
     
-    uri = "bolt://neo4j:7687"
-    graph = Graph(uri, auth=("neo4j", "test1234"))
-    """
-    driver = GraphDatabase.driver(uri, auth=("neo4j", "test1234"))
-    INDEX_NAME = "index-name"
-    embedder = OpenAIEmbeddings(model="text-embedding-3-large")
-    retriever = VectorRetriever(driver, INDEX_NAME, embedder)
-    llm = OpenAILLM(model_name="gpt-4o", model_params={"temperature": 0})
-    rag = GraphRAG(retriever=retriever, llm=llm)
-    """
-    
-    store_issues(graph)
-    store_changelogs(graph)
+    if graph_connected:
+        logger.info("Graph database connected successfully")
+        # Store data in graph database
+        store_issues()
+        store_changelogs()
+    else:
+        logger.info("Graph database not available - running in limited mode")
+        # Update system message to reflect limited functionality
+        global SYSTEM_MESSAGE
+        SYSTEM_MESSAGE += """
+
+Note: Advanced graph-based analysis is not currently available. For complex relationship queries or historical analysis, please ensure Neo4j is running and accessible.
+"""
     
     # Initialize chat with system message
     cl.user_session.set("messages", [
@@ -56,6 +63,11 @@ async def start():
         if system_locale.startswith('de')
         else "Welcome to Tahecho! How can I assist you today?"
     )
+    
+    # Add information about graph database status
+    if not graph_connected:
+        welcome_message += "\n\nNote: Running in limited mode - advanced graph analysis features are not available."
+    
     await cl.Message(welcome_message).send()
 
 @cl.on_message

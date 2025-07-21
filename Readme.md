@@ -11,9 +11,28 @@ You can ask the bot things as:
 * "Create a summary of the task Project X finished this week."
 * "Create an email of Project X for the stakeholders."
 
+## Running Modes
+
+Tahecho can run in two modes:
+
+### Full Mode (with Neo4j Graph Database)
+- **Complex relationship analysis** - Understand dependencies between issues
+- **Historical change tracking** - See what changed and when
+- **Dependency chain analysis** - Find blocking relationships
+- **Advanced graph-based queries** - Semantic search and reasoning
+- **All basic Jira operations** - Create, read, update issues
+
+### Limited Mode (without Neo4j)
+- **Basic Jira operations** - Direct issue management
+- **Task queries and updates** - Status changes, assignments
+- **MCP agent functionality** - Direct Jira API access
+- **No advanced analysis** - Limited to basic operations
+
+The app automatically detects which mode to use based on Neo4j availability.
+
 ## Integrations
 * Jira Cloud
-* Neo4j Graph Database
+* Neo4j Graph Database (optional)
 * OpenAI GPT-4
 
 ## Architecture
@@ -21,7 +40,7 @@ You can ask the bot things as:
 Tahecho uses a multi-agent system built with LangChain and LangGraph:
 - **Manager Agent**: Orchestrates and routes tasks to specialized agents
 - **MCP Agent**: Handles direct Jira operations (create, read, update issues)
-- **Graph Agent**: Performs complex reasoning using Neo4j graph database
+- **Graph Agent**: Performs complex reasoning using Neo4j graph database (when available)
 - **Task Classifier**: Determines which agent should handle each request
 
 ## Setup and Installation
@@ -29,9 +48,47 @@ Tahecho uses a multi-agent system built with LangChain and LangGraph:
 ### Prerequisites
 
 - Python 3.11+
-- Neo4j Database (local or cloud)
 - Jira Cloud account with API access
 - OpenAI API key
+- Neo4j Database (optional, for full mode)
+
+### Quick Start
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd tahecho
+   ```
+
+2. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your actual values:
+   # - OPENAI_API_KEY (required)
+   # - JIRA_INSTANCE_URL (required)
+   # - JIRA_USERNAME (required)
+   # - JIRA_API_TOKEN (required)
+   # - GRAPH_DB_ENABLED (optional, defaults to True)
+   ```
+
+4. **Test your setup**
+   ```bash
+   python test_setup.py
+   ```
+
+5. **Run the application**
+   ```bash
+   # Full mode (if Neo4j is available)
+   chainlit run app.py
+   
+   # Or minimal mode (no Neo4j required)
+   chainlit run app_minimal.py
+   ```
 
 ### Using Docker (Production)
 
@@ -46,55 +103,103 @@ Tahecho uses a multi-agent system built with LangChain and LangGraph:
 
 ### Local Development Setup
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd tahecho
-   ```
-
-2. **Create virtual environment**
+1. **Create virtual environment**
    ```bash
    python -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
-3. **Install dependencies**
+2. **Install dependencies**
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Set up environment variables**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your actual values:
-   # - OPENAI_API_KEY
-   # - JIRA_INSTANCE_URL
-   # - JIRA_USERNAME
-   # - JIRA_API_TOKEN
-   ```
+3. **Set up Neo4j (optional - for full mode)**
 
-5. **Set up Neo4j (choose one option)**
-
-   **Option A: Local Neo4j**
+   **Option A: Local Neo4j with Docker**
    ```bash
-   # Install Neo4j Desktop or use Docker
-   docker run -p 7474:7474 -p 7687:7687 -e NEO4J_AUTH=neo4j/test1234 neo4j:5
+   docker run \
+     --name neo4j \
+     -p 7474:7474 -p 7687:7687 \
+     -e NEO4J_AUTH=neo4j/test1234 \
+     -e NEO4J_PLUGINS='["apoc"]' \
+     neo4j:latest
    ```
 
    **Option B: Neo4j AuraDB (Cloud)**
    - Create account at https://neo4j.com/cloud/platform/aura-graph-database/
-   - Update connection string in your code
+   - Update connection string in your `.env` file
 
-6. **Set up MCP Server (optional for local development)**
+4. **Run the application**
    ```bash
-   # The MCP server is included in Docker setup
-   # For local development, you can run it separately or mock the tools
+   chainlit run app.py
    ```
 
-7. **Run the application**
-   ```bash
-   python app.py
-   ```
+## Configuration
+
+### Environment Variables
+
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `OPENAI_API_KEY` | OpenAI API key for LLM access | Yes | - |
+| `JIRA_INSTANCE_URL` | Jira Cloud instance URL | Yes | - |
+| `JIRA_USERNAME` | Jira username/email | Yes | - |
+| `JIRA_API_TOKEN` | Jira API token | Yes | - |
+| `JIRA_CLOUD` | Set to "true" for Jira Cloud | Yes | True |
+| `GRAPH_DB_ENABLED` | Enable/disable graph database | No | True |
+| `NEO4J_URI` | Neo4j connection URI | No | bolt://neo4j:7687 |
+| `NEO4J_USERNAME` | Neo4j username | No | neo4j |
+| `NEO4J_PASSWORD` | Neo4j password | No | test1234 |
+
+### Disabling Graph Database
+
+To run without Neo4j, set in your `.env` file:
+```bash
+GRAPH_DB_ENABLED=False
+```
+
+### Custom Neo4j Connection
+
+If your Neo4j is running on a different host or port:
+```bash
+NEO4J_URI=bolt://localhost:7687
+NEO4J_USERNAME=your_username
+NEO4J_PASSWORD=your_password
+```
+
+## Testing and Diagnostics
+
+### Test Setup
+```bash
+# Run comprehensive setup test
+python test_setup.py
+
+# Demo different running modes
+python demo_modes.py
+```
+
+### Troubleshooting
+
+**Graph Database Issues:**
+```bash
+# Check if Neo4j is running
+docker ps | grep neo4j
+
+# Test connection
+python -c "from utils.graph_db import graph_db_manager; print(graph_db_manager.connect())"
+```
+
+**App Won't Start:**
+1. Verify all required environment variables are set
+2. Check OpenAI API key is valid
+3. Ensure Jira credentials are correct
+4. Run diagnostic script: `python test_setup.py`
+
+**Limited Functionality:**
+If you see "Running in limited mode" message:
+- Neo4j is not available or not configured
+- App will still work for basic Jira operations
+- For full functionality, start Neo4j and ensure `GRAPH_DB_ENABLED=True`
 
 ## Development Workflow
 
@@ -218,9 +323,12 @@ The application will be available at http://localhost:8000
 
 ### Local Development
 ```bash
-python app.py
+# Full mode (with Neo4j)
+chainlit run app.py
+
+# Limited mode (without Neo4j)
+chainlit run app_minimal.py
 ```
-The application will be available at http://localhost:8000
 
 ### Stop the Application
 ```bash
@@ -231,84 +339,16 @@ docker compose down
 Ctrl+C
 ```
 
-## Configuration
+## Features by Mode
 
-### Environment Variables
+| Feature | Full Mode | Limited Mode |
+|---------|-----------|--------------|
+| Basic Jira queries | ✅ | ✅ |
+| Issue status updates | ✅ | ✅ |
+| Task management | ✅ | ✅ |
+| Relationship analysis | ✅ | ❌ |
+| Dependency chains | ✅ | ❌ |
+| Historical changes | ✅ | ❌ |
+| Complex reasoning | ✅ | ❌ |
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `OPENAI_API_KEY` | OpenAI API key for LLM access | Yes |
-| `JIRA_INSTANCE_URL` | Jira Cloud instance URL | Yes |
-| `JIRA_USERNAME` | Jira username/email | Yes |
-| `JIRA_API_TOKEN` | Jira API token | Yes |
-| `JIRA_CLOUD` | Set to "true" for Jira Cloud | Yes |
-
-### Neo4j Configuration
-
-Update the connection string in `utils/utils.py`:
-```python
-uri = "bolt://localhost:7687"  # Local Neo4j
-# or
-uri = "bolt://your-aura-instance.neo4j.io:7687"  # AuraDB
-```
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Import Errors**: Ensure all dependencies are installed
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. **Neo4j Connection**: Verify Neo4j is running and accessible
-   ```bash
-   # Test connection
-   python -c "from py2neo import Graph; g = Graph('bolt://localhost:7687', auth=('neo4j', 'test1234')); print('Connected!')"
-   ```
-
-3. **Jira API Issues**: Check your API token and permissions
-   ```bash
-   # Test Jira connection
-   python -c "from jira_integration.jira_client import jira_client; print(jira_client.get_instance())"
-   ```
-
-4. **OpenAI API Issues**: Verify your API key and quota
-   ```bash
-   # Test OpenAI connection
-   python -c "from openai import OpenAI; client = OpenAI(api_key='your-key'); print('Valid key!')"
-   ```
-
-### Debug Mode
-
-Enable debug logging:
-```bash
-export LOG_LEVEL=DEBUG
-python app.py
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Write tests first (TDD approach)
-4. Implement the feature
-5. Ensure all tests pass
-6. Submit a pull request
-
-### Development Guidelines
-
-- Follow TDD: Write tests before implementation
-- Maintain 90%+ test coverage
-- Use type hints throughout
-- Follow PEP 8 style guidelines
-- Write clear commit messages
-- Update documentation for new features
-
-## License
-
-This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
-
-## Third-Party Software
-
-This project uses third-party software components. For detailed information about these components and their licenses, please see [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
+The app will automatically detect the available mode and adjust its behavior accordingly.

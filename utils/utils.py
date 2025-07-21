@@ -1,10 +1,24 @@
 from datetime import datetime, timedelta
 from networkx import Graph
 import pytz
+import logging
 
 from jira_integration.jira_client import jira_client
+from utils.graph_db import graph_db_manager
 
-def store_changelogs(graph: Graph):
+logger = logging.getLogger(__name__)
+
+def store_changelogs(graph: Graph = None):
+    """Store changelogs in the graph database if available."""
+    if not graph_db_manager.is_available():
+        logger.info("Graph database not available, skipping changelog storage")
+        return
+        
+    graph = graph or graph_db_manager.get_graph()
+    if not graph:
+        logger.warning("No graph connection available for changelog storage")
+        return
+        
     important_fields = {"status", "asignee", "summary", "description"}
     events = []
     cypher_query = """
@@ -72,7 +86,17 @@ def store_changelogs(graph: Graph):
     })
     print("Changelogs añadidos")
     
-def store_issues(graph: Graph):
+def store_issues(graph: Graph = None):
+    """Store issues in the graph database if available."""
+    if not graph_db_manager.is_available():
+        logger.info("Graph database not available, skipping issue storage")
+        return
+        
+    graph = graph or graph_db_manager.get_graph()
+    if not graph:
+        logger.warning("No graph connection available for issue storage")
+        return
+        
     for issue in jira_client.get_all_jira_issues():
         key = issue.get("key", "")
         summary = issue.get("summary", "")

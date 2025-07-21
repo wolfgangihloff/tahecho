@@ -1,106 +1,140 @@
 # Tahecho Setup Guide
 
-## ✅ Current Status
+## Overview
+Tahecho is a personal assistant that can work with or without a graph database (Neo4j). The app will automatically detect if Neo4j is available and adjust its functionality accordingly.
 
-Your Tahecho project is **partially set up and working**:
+## Environment Variables
 
-- ✅ **LangChain 0.3.x** - Successfully migrated and working
-- ✅ **OpenAI Integration** - Using new `init_chat_model` approach
-- ✅ **Environment Variables** - Properly configured
-- ✅ **Python Dependencies** - All installed via Poetry
-- ❌ **Neo4j Database** - Not running (required for full functionality)
+Create a `.env` file in the project root with the following variables:
 
-## Required Environment Variables
-
-Your `.env` file should contain:
-
+### Required Variables
 ```bash
-# OpenAI Configuration (REQUIRED)
+# OpenAI API Key (required)
 OPENAI_API_KEY=your_openai_api_key_here
 
-# Jira Configuration (OPTIONAL)
+# Jira Configuration (required for Jira functionality)
 JIRA_INSTANCE_URL=https://your-domain.atlassian.net
-JIRA_USERNAME=your_jira_username
+JIRA_USERNAME=your_email@domain.com
 JIRA_API_TOKEN=your_jira_api_token
 JIRA_CLOUD=True
 ```
 
-## Testing Your Setup
-
-### 1. Test LangChain Setup (Working ✅)
+### Optional Graph Database Variables
 ```bash
-poetry run python app_minimal.py
+# Graph Database Configuration (optional)
+GRAPH_DB_ENABLED=True  # Set to False to disable graph database completely
+NEO4J_URI=bolt://neo4j:7687  # Default Neo4j connection URI
+NEO4J_USERNAME=neo4j  # Default Neo4j username
+NEO4J_PASSWORD=test1234  # Default Neo4j password
 ```
 
-### 2. Test Full Setup
+## Running Modes
+
+### Mode 1: Full Mode (with Neo4j)
+When `GRAPH_DB_ENABLED=True` and Neo4j is running:
+- Full functionality including complex relationship analysis
+- Historical change tracking
+- Dependency chain analysis
+- Advanced graph-based queries
+
+### Mode 2: Limited Mode (without Neo4j)
+When `GRAPH_DB_ENABLED=False` or Neo4j is not available:
+- Basic Jira operations via MCP agent
+- Direct issue queries and management
+- No complex relationship analysis
+- No historical change tracking
+
+## Setup Instructions
+
+### 1. Install Dependencies
 ```bash
-poetry run python test_setup.py
+pip install -r requirements.txt
 ```
 
-## Running Options
+### 2. Set Environment Variables
+Create your `.env` file with the required variables listed above.
 
-### Option 1: Minimal Mode (No Neo4j)
+### 3. Test Setup
+Run the diagnostic script to verify your configuration:
 ```bash
-poetry run python app_minimal.py
+python test_setup.py
 ```
-- ✅ Works immediately
-- ✅ Tests LangChain integration
-- ❌ No database persistence
-- ❌ No Jira integration
 
-### Option 2: Full Mode (With Neo4j)
+### 4. Start Neo4j (Optional - for Full Mode)
+If you want full functionality with graph database:
 
-#### Start Neo4j Database:
+#### Using Docker:
 ```bash
-# Option A: Using Docker (recommended)
-docker run -d --name neo4j -p 7474:7474 -p 7687:7687 -e NEO4J_AUTH=neo4j/test1234 neo4j:latest
+docker run \
+  --name neo4j \
+  -p 7474:7474 -p 7687:7687 \
+  -e NEO4J_AUTH=neo4j/test1234 \
+  -e NEO4J_PLUGINS='["apoc"]' \
+  neo4j:latest
+```
 
-# Option B: Using Docker Compose (if you have docker-compose.yml)
+#### Using Docker Compose:
+```bash
 docker-compose up -d neo4j
 ```
 
-#### Run Full Application:
+### 5. Run the Application
+
+#### Full Mode (with Neo4j):
 ```bash
-poetry run python app.py
+chainlit run app.py
+```
+
+#### Minimal Mode (without Neo4j):
+```bash
+chainlit run app_minimal.py
+```
+
+## Configuration Options
+
+### Disabling Graph Database Completely
+Set in your `.env` file:
+```bash
+GRAPH_DB_ENABLED=False
+```
+
+### Custom Neo4j Connection
+If your Neo4j is running on a different host or port:
+```bash
+NEO4J_URI=bolt://localhost:7687
+NEO4J_USERNAME=your_username
+NEO4J_PASSWORD=your_password
 ```
 
 ## Troubleshooting
 
-### Docker Issues
-If Docker isn't running:
-1. Start Docker Desktop
-2. Or install Docker: https://docs.docker.com/get-docker/
+### Graph Database Connection Issues
+1. Check if Neo4j is running: `docker ps | grep neo4j`
+2. Verify connection settings in `.env`
+3. Test connection: `python -c "from utils.graph_db import graph_db_manager; print(graph_db_manager.connect())"`
 
-### Neo4j Connection Issues
-- Make sure Neo4j is running: `docker ps | grep neo4j`
-- Check if port 7687 is available: `lsof -i :7687`
-- Restart Neo4j: `docker restart neo4j`
+### App Won't Start
+1. Verify all required environment variables are set
+2. Check OpenAI API key is valid
+3. Ensure Jira credentials are correct
+4. Run diagnostic script: `python test_setup.py`
 
-### Environment Variables
-- Ensure `.env` file exists in project root
-- Check variable names match exactly
-- Restart terminal after adding new variables
+### Limited Functionality
+If you see "Running in limited mode" message:
+- Neo4j is not available or not configured
+- App will still work for basic Jira operations
+- For full functionality, start Neo4j and ensure `GRAPH_DB_ENABLED=True`
 
-## Next Steps
+## Features by Mode
 
-1. **For immediate testing**: Use `app_minimal.py` to test the LangChain integration
-2. **For full functionality**: Start Neo4j and use `app.py`
-3. **For development**: The setup is ready for development work
+| Feature | Full Mode | Limited Mode |
+|---------|-----------|--------------|
+| Basic Jira queries | ✅ | ✅ |
+| Issue status updates | ✅ | ✅ |
+| Task management | ✅ | ✅ |
+| Relationship analysis | ✅ | ❌ |
+| Dependency chains | ✅ | ❌ |
+| Historical changes | ✅ | ❌ |
+| Complex reasoning | ✅ | ❌ |
 
-## Development Commands
-
-```bash
-# Install dependencies
-poetry install
-
-# Run tests
-poetry run pytest
-
-# Format code
-poetry run black .
-poetry run isort .
-
-# Run linting
-poetry run flake8
-poetry run mypy .
-``` 
+The app will automatically detect the available mode and adjust its behavior accordingly. 
