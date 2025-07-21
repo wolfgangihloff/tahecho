@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "AI-powered Jira assistant using LangChain, LangGraph, and Neo4j"
 authors = ["Wolfgang Ihloff <wolfgang.ihloff@example.com>"]
 readme = "Readme.md"
+license = "MIT"
 packages = [{include = "tahecho", from = "src"}]
 
 [tool.poetry.dependencies]
@@ -50,6 +51,12 @@ isort = "*"
 flake8 = "*"
 mypy = "*"
 pre-commit = "*"
+
+# SBOM generation for BSI TR-03183 compliance
+cyclonedx-py = "*"
+
+[tool.poetry.scripts]
+generate-sbom = "scripts.generate_sbom:main"
 
 [build-system]
 requires = ["poetry-core"]

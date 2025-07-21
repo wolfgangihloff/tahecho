@@ -2,3 +2,8 @@
 __pycache__
 .env
 
+# Keep SBOM files in repository for compliance
+# sbom.json
+# sbom.xml
+# sbom-summary.md
+

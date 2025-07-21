@@ -352,3 +352,41 @@ Ctrl+C
 | Complex reasoning | ✅ | ❌ |
 
 The app will automatically detect the available mode and adjust its behavior accordingly.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## BSI TR-03183 Compliance
+
+This project complies with German BSI TR-03183 cybersecurity standards, specifically Part 2 "Software Bill of Materials (SBOM)".
+
+### SBOM Generation
+
+#### Automated Generation (Recommended)
+SBOM reports are automatically generated on every commit to the main branch via GitHub Actions and published to [GitHub Pages](https://your-username.github.io/tahecho/).
+
+#### Manual Generation
+Generate a Software Bill of Materials in CycloneDX format locally:
+
+```bash
+# Using Poetry script
+poetry run generate-sbom
+
+# Or directly
+python scripts/generate_sbom.py
+```
+
+This will create:
+- `sbom.json` - CycloneDX JSON format (BSI preferred)
+- `sbom.xml` - CycloneDX XML format
+
+### Compliance Features
+
+✅ **CycloneDX Format** - Industry standard SBOM format supported by BSI  
+✅ **Component Tracking** - All dependencies and their versions documented  
+✅ **License Information** - Complete license compliance documentation  
+✅ **Vulnerability Ready** - SBOM format supports vulnerability reporting  
+✅ **Metadata** - BSI TR-03183 compliance markers included  
+✅ **Automated CI/CD** - GitHub Actions generate reports on every commit  
+✅ **GitHub Pages** - Reports published to dedicated compliance page
