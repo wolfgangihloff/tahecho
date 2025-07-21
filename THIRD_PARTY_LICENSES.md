@@ -33,6 +33,6 @@ This project incorporates third-party software components. Their licenses and at
 
 ## License Compliance
 
-This project is licensed under the GNU General Public License v3.0. All third-party components are used in compliance with their respective licenses. The complete source code for this project and information about obtaining the source code of third-party components can be found in their respective repositories linked above.
+This project is licensed under the MIT License. All third-party components are used in compliance with their respective licenses. The complete source code for this project and information about obtaining the source code of third-party components can be found in their respective repositories linked above.
 
-Note that while this project is GPL v3 licensed, some dependencies use different open source licenses (MIT, Apache 2.0). This is compliant with GPL v3 as these licenses are compatible with GPL v3 when used as dependencies.
+Note that this project uses the MIT License, which is compatible with all the third-party dependencies listed above (MIT, Apache 2.0). The MIT License allows for maximum flexibility in how the software can be used, modified, and distributed.

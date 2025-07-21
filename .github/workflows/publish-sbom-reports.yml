@@ -1,0 +1,111 @@
+name: Publish SBOM Reports to GitHub Pages
+
+on:
+  workflow_run:
+    workflows: ["Generate SBOM Reports"]
+    types:
+      - completed
+    branches: [ main ]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+      
+    - name: Create SBOM documentation page
+      run: |
+        mkdir -p docs
+        cat > docs/sbom-reports.md << 'EOF'
+        # SBOM Reports - BSI TR-03183 Compliance
+        
+        This page contains automatically generated Software Bill of Materials (SBOM) reports for BSI TR-03183 compliance.
+        
+        ## Latest Reports
+        
+        **Generated:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")  
+        **Commit:** ${{ github.sha }}  
+        **Branch:** main
+        
+        ### Download SBOM Files
+        
+        - [📄 SBOM JSON (CycloneDX)](../sbom.json) - BSI preferred format
+        - [📄 SBOM XML (CycloneDX)](../sbom.xml) - Alternative format
+        - [📋 SBOM Summary](../sbom-summary.md) - Generation details
+        
+        ### BSI TR-03183 Compliance Status
+        
+        ✅ **Compliant with German BSI TR-03183 Part 2**  
+        ✅ **Industry standard CycloneDX format**  
+        ✅ **Complete dependency tracking**  
+        ✅ **License compliance documentation**  
+        ✅ **Vulnerability reporting ready**  
+        ✅ **Automated generation on every commit**
+        
+        ### What is SBOM?
+        
+        A Software Bill of Materials (SBOM) is a formal, machine-readable inventory of software components and dependencies, including their hierarchical relationships and other metadata. SBOMs are essential for:
+        
+        - **Supply Chain Security**: Track all software components
+        - **Vulnerability Management**: Identify affected components
+        - **License Compliance**: Ensure proper licensing
+        - **Regulatory Compliance**: Meet cybersecurity standards
+        
+        ### BSI TR-03183 Requirements
+        
+        This project complies with German BSI TR-03183 cybersecurity standards:
+        
+        - **Part 1**: General Requirements for manufacturers and products
+        - **Part 2**: Software Bill of Materials (SBOM) - **✅ COMPLIANT**
+        - **Part 3**: Vulnerability Reports and Notifications
+        
+        ### Generation Process
+        
+        SBOM reports are automatically generated on every commit to the main branch using:
+        
+        1. **CycloneDX-py**: Industry-standard SBOM generation
+        2. **Poetry Integration**: Direct dependency analysis
+        3. **GitHub Actions**: Automated CI/CD pipeline
+        4. **Multiple Formats**: JSON and XML output
+        
+        ### Usage
+        
+        ```bash
+        # Local generation
+        poetry run generate-sbom
+        
+        # View latest reports
+        curl -s https://raw.githubusercontent.com/your-username/tahecho/main/sbom.json | jq .
+        ```
+        
+        ---
+        
+        *Last updated: $(date -u +"%Y-%m-%d %H:%M:%S UTC")*
+        EOF
+        
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: docs
+        
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4 

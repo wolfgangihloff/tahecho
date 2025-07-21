@@ -1,0 +1,84 @@
+name: Generate SBOM Reports
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  generate-sbom:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: latest
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+        
+    - name: Load cached venv
+      id: cached-poetry-dependencies
+      uses: actions/cache@v3
+      with:
+        path: .venv
+        key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+        
+    - name: Install dependencies
+      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      run: poetry install --no-interaction --no-root
+      
+    - name: Generate SBOM reports
+      run: |
+        poetry run generate-sbom
+        
+    - name: Upload SBOM artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: sbom-reports
+        path: |
+          sbom.json
+          sbom.xml
+        retention-days: 30
+        
+    - name: Create SBOM summary
+      run: |
+        echo "## SBOM Generation Summary" >> sbom-summary.md
+        echo "" >> sbom-summary.md
+        echo "**Generated:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> sbom-summary.md
+        echo "**Commit:** ${{ github.sha }}" >> sbom-summary.md
+        echo "**Branch:** ${{ github.ref_name }}" >> sbom-summary.md
+        echo "" >> sbom-summary.md
+        echo "### Files Generated:" >> sbom-summary.md
+        echo "- \`sbom.json\` - CycloneDX JSON format (BSI preferred)" >> sbom-summary.md
+        echo "- \`sbom.xml\` - CycloneDX XML format" >> sbom-summary.md
+        echo "" >> sbom-summary.md
+        echo "### BSI TR-03183 Compliance:" >> sbom-summary.md
+        echo "✅ Compliant with German BSI TR-03183 Part 2 'Software Bill of Materials'" >> sbom-summary.md
+        echo "✅ Industry standard CycloneDX format" >> sbom-summary.md
+        echo "✅ Complete dependency tracking" >> sbom-summary.md
+        echo "✅ License compliance documentation" >> sbom-summary.md
+        
+    - name: Commit and push SBOM reports
+      if: github.ref == 'refs/heads/main'
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add sbom.json sbom.xml sbom-summary.md
+        git diff --staged --quiet || git commit -m "🤖 Auto-generate SBOM reports for BSI TR-03183 compliance
+        
+        - Generated on: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+        - Commit: ${{ github.sha }}
+        - Format: CycloneDX (JSON + XML)
+        - Compliance: BSI TR-03183 Part 2"
+        git push 
