@@ -21,6 +21,7 @@ chainlit = "^2.0.602"
 # Database
 py2neo = "*"
 neo4j = "*"
+supabase = "^2.3.0"
 
 # Jira integration
 atlassian-python-api = "*"
@@ -32,6 +33,13 @@ openai = "*"
 python-dotenv = "*"
 pytz = "*"
 networkx = "*"
+beautifulsoup4 = "*"
+requests = "*"
+
+# Sitemap and Scraping
+scrapy = "*"
+click = "*"
+pyyaml = "*"
 
 # Monitoring/Logging
 langsmith = "*"
