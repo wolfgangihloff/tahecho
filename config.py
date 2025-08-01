@@ -13,6 +13,8 @@ CONFIG = {
     "NEO4J_URI": os.getenv("NEO4J_URI", "bolt://neo4j:7687"),
     "NEO4J_USERNAME": os.getenv("NEO4J_USERNAME", "neo4j"),
     "NEO4J_PASSWORD": os.getenv("NEO4J_PASSWORD", "test1234"),
+    "LANGCHAIN_API_KEY": os.getenv("LANGCHAIN_API_KEY"),
+    "LANGCHAIN_PROJECT": os.getenv("LANGCHAIN_PROJECT", "tahecho"),
     "OPENAI_SETTINGS": {
         "model": "gpt-4o",
         "temperature": 0.7,

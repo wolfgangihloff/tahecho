@@ -4,16 +4,33 @@ import chainlit as cl
 import locale
 import logging
 from config import CONFIG
-from literalai import LiteralClient
+import os
 from utils.utils import store_changelogs, store_issues
 from utils.graph_db import graph_db_manager
+from utils.error_handling import setup_error_handling
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-lai = LiteralClient(api_key="lsk_Za7jwDIUEszFc9vXyBOB99Qkz5wfRkGeRwiYcff0")
-lai.instrument_openai()
+# Set up error handling
+setup_error_handling()
+
+# Set up LangChain tracing with LangSmith
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
+os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
+
+# Use environment variables directly from .env file
+langchain_api_key = os.getenv("LANGCHAIN_API_KEY")
+if langchain_api_key:
+    os.environ["LANGCHAIN_API_KEY"] = langchain_api_key
+    logger.info("LangChain API key configured from environment")
+else:
+    logger.info("No LangChain API key found - tracing will work without authentication")
+
+langchain_project = os.getenv("LANGCHAIN_PROJECT", "tahecho")
+os.environ["LANGCHAIN_PROJECT"] = langchain_project
+logger.info(f"LangChain project set to: {langchain_project}")
 
 # System message to set the context
 SYSTEM_MESSAGE = """You are Tahecho, a personal assistant focused on helping users with:
@@ -31,12 +48,26 @@ For Jira functionality, you can:
 - Help manage and track Jira tasks efficiently
 """
 
-client = OpenAI(api_key=CONFIG["OPENAI_API_KEY"])
+# Initialize OpenAI client using environment variable directly
+openai_api_key = os.getenv("OPENAI_API_KEY")
+if not openai_api_key:
+    logger.error("OPENAI_API_KEY not found in environment variables")
+    raise ValueError("OPENAI_API_KEY environment variable is required")
+
+client = OpenAI(api_key=openai_api_key)
+logger.info("OpenAI client initialized successfully")
 
 @cl.on_chat_start
 async def start():
-    # Attempt to connect to graph database
-    graph_connected = graph_db_manager.connect()
+    # Check if graph database is enabled via environment variable
+    graph_db_enabled = os.getenv("GRAPH_DB_ENABLED", "True").lower() == "true"
+    
+    if graph_db_enabled:
+        # Attempt to connect to graph database
+        graph_connected = graph_db_manager.connect()
+    else:
+        logger.info("Graph database disabled via environment variable")
+        graph_connected = False
     
     if graph_connected:
         logger.info("Graph database connected successfully")

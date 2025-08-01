@@ -34,7 +34,7 @@ pytz = "*"
 networkx = "*"
 
 # Monitoring/Logging
-literalai = "*"
+langsmith = "*"
 
 [tool.poetry.group.dev.dependencies]
 # Testing
