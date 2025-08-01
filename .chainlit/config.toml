@@ -9,6 +9,17 @@ user_env = []
 # Duration (in seconds) during which the session is saved when the connection is lost
 session_timeout = 3600
 
+# Socket.IO configuration to handle connection issues
+[socketio]
+# Maximum number of packets in a single payload
+max_payload_size = 1000000
+# Enable compression
+compression = true
+# Enable binary messages
+binary = false
+# Enable polling fallback
+allow_upgrades = true
+
 # Enable third parties caching (e.g LangChain cache)
 cache = false
 
