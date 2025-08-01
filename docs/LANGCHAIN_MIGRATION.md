@@ -121,7 +121,7 @@ response = langchain_manager_agent.run(message.content, conversation_id=conversa
 
 Run the test script to verify the migration:
 ```bash
-python test_langchain_implementation.py
+python tests/integration/test_langchain_implementation.py
 ```
 
 This will test:

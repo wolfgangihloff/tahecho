@@ -114,5 +114,21 @@ Response format:
             return state
 
 
-# Global instance - will be created when needed
-task_classifier = None 
+# Global instance - lazy initialization
+_task_classifier_instance = None
+
+def get_task_classifier():
+    """Get the global task classifier instance, creating it if needed."""
+    global _task_classifier_instance
+    if _task_classifier_instance is None:
+        _task_classifier_instance = TaskClassifier()
+    return _task_classifier_instance
+
+# For backward compatibility - this will be set when first accessed
+task_classifier = None
+
+def __getattr__(name):
+    """Lazy load the task_classifier when first accessed."""
+    if name == 'task_classifier':
+        return get_task_classifier()
+    raise AttributeError(f"module '{__name__}' has no attribute '{name}'") 

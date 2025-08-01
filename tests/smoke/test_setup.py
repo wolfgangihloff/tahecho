@@ -100,38 +100,42 @@ def test_graph_database():
     print("\n🔍 Testing Graph Database Connection...")
     
     try:
-        from utils.graph_db import graph_db_manager
+        from utils.graph_db import GraphDatabase
+        
+        # Check if graph database is enabled
+        graph_enabled = os.getenv("GRAPH_DB_ENABLED", "false").lower() == "true"
+        
+        if not graph_enabled:
+            print("⚠️  Graph database disabled - skipping test")
+            return True
         
         # Test connection
-        connected = graph_db_manager.connect()
-        
-        if connected:
-            print("✅ Neo4j connection successful")
-            print("✅ Running in FULL MODE - all features available")
+        graph_db = GraphDatabase()
+        if graph_db.is_connected():
+            print("✅ Graph database connection successful")
             return True
         else:
-            print("⚠️  Neo4j not available")
-            print("✅ Running in LIMITED MODE - basic features only")
-            return True  # This is not an error, just limited functionality
+            print("❌ Graph database connection failed")
+            return False
             
     except Exception as e:
         print(f"❌ Graph database test failed: {str(e)}")
         return False
 
 def test_jira_integration():
-    """Test Jira integration."""
+    """Test Jira integration setup."""
     print("\n🔍 Testing Jira Integration...")
     
     try:
-        from jira_integration.jira_client import jira_client
+        from jira_integration.jira_client import JiraClient
         
-        # Test basic Jira connection
-        issues = jira_client.get_all_jira_issues()
-        print(f"✅ Jira connection successful - found {len(issues)} issues")
+        # Test client creation (without making actual requests)
+        client = JiraClient()
+        print("✅ Jira client creation successful")
         return True
         
     except Exception as e:
-        print(f"❌ Jira integration failed: {str(e)}")
+        print(f"❌ Jira integration test failed: {str(e)}")
         return False
 
 def test_agent_setup():
@@ -139,20 +143,26 @@ def test_agent_setup():
     print("\n🔍 Testing Agent Setup...")
     
     try:
-        from agents.langchain_manager_agent import langchain_manager_agent
-        from agents.langchain_mcp_agent import langchain_mcp_agent
-        from agents.langchain_graph_agent import langchain_graph_agent
+        from agents.state import AgentState, create_initial_state
+        from agents.task_classifier import task_classifier
         
-        print("✅ All agents imported successfully")
+        # Test state creation
+        state = create_initial_state("Test message", "test_conversation")
+        print("✅ State management working")
+        
+        # Test task classifier
+        result_state = task_classifier.classify_task(state)
+        print("✅ Task classifier working")
+        
         return True
         
     except Exception as e:
-        print(f"❌ Agent setup failed: {str(e)}")
+        print(f"❌ Agent setup test failed: {str(e)}")
         return False
 
 def main():
-    """Run all diagnostic tests."""
-    print("🚀 Tahecho Setup Diagnostic")
+    """Run all setup tests."""
+    print("🧪 Tahecho Setup Test Suite")
     print("=" * 50)
     
     tests = [
@@ -167,42 +177,41 @@ def main():
     results = []
     
     for test_name, test_func in tests:
+        print(f"\n{'='*20} {test_name} {'='*20}")
         try:
             result = test_func()
             results.append((test_name, result))
         except Exception as e:
-            print(f"❌ {test_name} test crashed: {str(e)}")
+            print(f"❌ {test_name} failed with exception: {str(e)}")
             results.append((test_name, False))
     
     # Summary
     print("\n" + "=" * 50)
-    print("📊 Test Results Summary")
+    print("📊 TEST SUMMARY")
     print("=" * 50)
     
     passed = 0
-    total = len(results)
+    failed = 0
     
     for test_name, result in results:
         status = "✅ PASS" if result else "❌ FAIL"
-        print(f"{status} {test_name}")
+        print(f"{status}: {test_name}")
         if result:
             passed += 1
+        else:
+            failed += 1
     
-    print(f"\nOverall: {passed}/{total} tests passed")
+    print(f"\nTotal: {passed + failed} tests")
+    print(f"Passed: {passed}")
+    print(f"Failed: {failed}")
     
-    if passed == total:
-        print("🎉 All tests passed! Your setup is ready.")
-        print("\nYou can now run:")
-        print("  chainlit run app.py")
-    elif passed >= 4:  # At least basic functionality works
-        print("⚠️  Basic functionality available, but some features may be limited.")
-        print("\nYou can still run:")
-        print("  chainlit run app.py")
+    if failed == 0:
+        print("\n🎉 All tests passed! Tahecho is ready to use.")
+        return True
     else:
-        print("❌ Setup has issues. Please check the errors above.")
-        return 1
-    
-    return 0
+        print(f"\n⚠️  {failed} test(s) failed. Please check the configuration.")
+        return False
 
 if __name__ == "__main__":
-    sys.exit(main()) 
+    success = main()
+    sys.exit(0 if success else 1) 

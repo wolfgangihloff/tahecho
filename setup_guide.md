@@ -57,7 +57,7 @@ Create your `.env` file with the required variables listed above.
 ### 3. Test Setup
 Run the diagnostic script to verify your configuration:
 ```bash
-python test_setup.py
+python tests/smoke/test_setup.py
 ```
 
 ### 4. Start Neo4j (Optional - for Full Mode)
@@ -117,7 +117,7 @@ NEO4J_PASSWORD=your_password
 1. Verify all required environment variables are set
 2. Check OpenAI API key is valid
 3. Ensure Jira credentials are correct
-4. Run diagnostic script: `python test_setup.py`
+4. Run diagnostic script: `python tests/smoke/test_setup.py`
 
 ### Limited Functionality
 If you see "Running in limited mode" message:
