@@ -1,3 +1,4 @@
+import logging
 import re
 from typing import Any, Dict, Optional
 
@@ -8,13 +9,23 @@ from langchain_core.prompts import ChatPromptTemplate
 from config import CONFIG
 from tahecho.agents.state import AgentState
 
+logger = logging.getLogger(__name__)
+
 
 class TaskClassifier:
     """Classifies user tasks to determine which agent should handle them."""
 
     def __init__(self) -> None:
+        openai_settings = CONFIG.get("OPENAI_SETTINGS", {})
+        if not isinstance(openai_settings, dict):
+            raise ValueError("OPENAI_SETTINGS must be a dictionary")
+        
+        model = openai_settings.get("model")
+        if not isinstance(model, str):
+            raise ValueError("OPENAI_SETTINGS.model must be a string")
+            
         self.llm = init_chat_model(
-            CONFIG["OPENAI_SETTINGS"]["model"], model_provider="openai", temperature=0.1
+            model, model_provider="openai", temperature=0.1
         )
 
         self.classification_prompt = ChatPromptTemplate.from_template(

@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 class JiraMCPAgent:
     """Jira Agent using MCP Atlassian server for Jira operations."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.llm = init_chat_model(
             CONFIG["OPENAI_SETTINGS"]["model"], model_provider="openai", temperature=0.1
         )
@@ -82,7 +82,7 @@ You can:
         self.agent_executor = self._create_agent()
         self.mcp_process = None
 
-    def _check_mcp_server(self):
+    def _check_mcp_server(self) -> bool:
         """Check if MCP Atlassian server is running externally."""
         try:
             # Check if there's a running MCP server process
@@ -104,7 +104,7 @@ You can:
             logger.error(f"❌ Error checking for MCP server: {e}")
             return False
 
-    def _stop_mcp_server(self):
+    def _stop_mcp_server(self) -> None:
         """Stop the MCP Atlassian server process."""
         if self.mcp_process and self.mcp_process.poll() is None:
             logger.info("Stopping MCP Atlassian server...")
@@ -147,7 +147,7 @@ The server will read your Jira credentials from the .env file. Once started, try
                 import concurrent.futures
                 import threading
                 
-                def run_async_in_thread():
+                def run_async_in_thread() -> str:
                     # Create a new event loop for this thread
                     new_loop = asyncio.new_event_loop()
                     asyncio.set_event_loop(new_loop)
@@ -475,7 +475,7 @@ The server will read your Jira credentials from the .env file. Once started, try
         ]
         return tools
 
-    def _create_agent(self):
+    def _create_agent(self) -> AgentExecutor:
         prompt = ChatPromptTemplate.from_template(
             self.system_prompt
             + """
@@ -557,7 +557,7 @@ Please use the available tools to interact with Jira and provide a helpful respo
         else:
             return "I encountered an issue while accessing Jira. Please try again or rephrase your question."
 
-    def __del__(self):
+    def __del__(self) -> None:
         """Cleanup when the agent is destroyed."""
         self._stop_mcp_server()
 
