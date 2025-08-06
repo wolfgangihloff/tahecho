@@ -1,13 +1,13 @@
 from openai import OpenAI
-from agents.langchain_manager_agent import langchain_manager_agent
+from tahecho.agents.langchain_manager_agent import langchain_manager_agent
 import chainlit as cl
 import locale
 import logging
 from config import CONFIG
 import os
-from utils.utils import store_changelogs, store_issues
-from utils.graph_db import graph_db_manager
-from utils.error_handling import setup_error_handling
+from tahecho.utils.utils import store_changelogs, store_issues
+from tahecho.utils.graph_db import graph_db_manager
+from tahecho.utils.error_handling import setup_error_handling
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -46,6 +46,15 @@ For Jira functionality, you can:
 - List all issues assigned to the current user
 - Show issue details and status updates
 - Help manage and track Jira tasks efficiently
+- Create new tickets in projects
+- Search for tickets using JQL queries
+- Get detailed information about specific tickets
+
+You can ask me things like:
+- "What tickets are assigned to me?"
+- "Please create a new ticket in project PGA with the content: Implement user authentication feature"
+- "Show me all tickets in the PGA project"
+- "Get details for ticket PGA-123"
 """
 
 # Initialize OpenAI client using environment variable directly

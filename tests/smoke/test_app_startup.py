@@ -1,8 +1,10 @@
+import os
 import subprocess
 import sys
-import os
-import pytest
 from unittest.mock import patch
+
+import pytest
+
 
 def test_app_starts_minimal(monkeypatch):
     """Smoke test: app.py should start without crashing (integration points mocked)."""
@@ -14,7 +16,7 @@ def test_app_starts_minimal(monkeypatch):
     monkeypatch.setenv("JIRA_CLOUD", "true")
 
     # Patch sys.argv to avoid issues
-    monkeypatch.setattr(sys, "argv", ["app.py"])  
+    monkeypatch.setattr(sys, "argv", ["app.py"])
 
     # Run the app in a subprocess, but exit after import
     # Mock py2neo import to avoid database dependency
@@ -25,7 +27,9 @@ def test_app_starts_minimal(monkeypatch):
         "sys.modules['py2neo'].Graph = type('Graph', (), {}); "
         "import app; print('APP_STARTUP_OK')"
     )
-    result = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, timeout=10)
-    
+    result = subprocess.run(
+        [sys.executable, "-c", code], capture_output=True, text=True, timeout=10
+    )
+
     assert "APP_STARTUP_OK" in result.stdout
-    assert result.returncode == 0 
+    assert result.returncode == 0
