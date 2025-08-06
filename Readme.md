@@ -4,10 +4,11 @@ Tahecho is your new product team member that likes to make process effective, ea
 
 ## Features
 
-You can ask the bot things as:
-* "Show me my Jira issues"
-* "What tasks are assigned to me?"
-* "List my Jira tasks"
+You can ask the bot things like:
+* **"What tickets are assigned to me?"** - Lists your assigned Jira tickets
+* **"Please create a new ticket in project PGA with the content: Implement user authentication feature"** - Creates new tickets
+* **"Show me all tickets in the PGA project"** - Lists all tickets in a project
+* **"Get details for ticket PGA-123"** - Gets detailed information about specific tickets
 * "Create a summary of the task Project X finished this week."
 * "Create an email of Project X for the stakeholders."
 
@@ -31,14 +32,16 @@ Tahecho can run in two modes:
 The app automatically detects which mode to use based on Neo4j availability.
 
 ## Integrations
-* Jira Cloud
-* Neo4j Graph Database (optional)
-* OpenAI GPT-4
+* **Jira Cloud** - Full API integration using MCP Atlassian server
+* **Neo4j Graph Database** (optional) - For advanced relationship analysis
+* **OpenAI GPT-4** - For natural language processing
+* **MCP (Model Context Protocol)** - For structured Jira interactions
 
 ## Architecture
 
 Tahecho uses a multi-agent system built with LangChain and LangGraph:
 - **Manager Agent**: Orchestrates and routes tasks to specialized agents
+- **Jira MCP Agent**: Handles Jira-specific operations using MCP Atlassian server
 - **MCP Agent**: Handles direct Jira operations (create, read, update issues)
 - **Graph Agent**: Performs complex reasoning using Neo4j graph database (when available)
 - **Task Classifier**: Determines which agent should handle each request
@@ -48,9 +51,11 @@ Tahecho uses a multi-agent system built with LangChain and LangGraph:
 ### Prerequisites
 
 - Python 3.11+
+- [Poetry](https://python-poetry.org/) for dependency management
 - Jira Cloud account with API access
 - OpenAI API key
 - Neo4j Database (optional, for full mode)
+- [uv](https://github.com/astral-sh/uv) for MCP server management (installed automatically)
 
 ### Quick Start
 
@@ -62,7 +67,11 @@ Tahecho uses a multi-agent system built with LangChain and LangGraph:
 
 2. **Install dependencies**
    ```bash
-   pip install -r requirements.txt
+   # Install Poetry if you don't have it
+   curl -sSL https://install.python-poetry.org | python3 -
+   
+   # Install project dependencies
+   poetry install
    ```
 
 3. **Set up environment variables**
@@ -78,27 +87,28 @@ Tahecho uses a multi-agent system built with LangChain and LangGraph:
 
 4. **Test your setup**
    ```bash
-   python tests/smoke/test_setup.py
+   poetry run python tests/smoke/test_setup.py
    ```
 
-5. **Run the application**
+5. **Start the MCP-Atlassian server** (required for Jira integration)
    ```bash
-   # Full mode (if Neo4j is available)
-   chainlit run app.py
+   # Option 1: Use the helper script (recommended)
+   python start_mcp_server.py
+   
+   # Option 2: Start manually
+   uvx mcp-atlassian
+   ```
+
+6. **Run the application**
+   ```bash
+   # Using Poetry (recommended)
+   poetry run chainlit run app.py
+   
+   # For development with auto-reload
+   poetry run chainlit run app.py --watch
    
    # Or minimal mode (no Neo4j required)
-   chainlit run app_minimal.py
-   ```
-
-### Using Docker (Production)
-
-1. Make sure you have Docker and Docker Compose installed on your system
-2. Clone this repository
-3. Create a `.env` file based on `.env.example`
-   * For Jira API tokens, go to: https://id.atlassian.com/manage-profile/security/api-tokens
-4. Build and start the Docker container:
-   ```bash
-   docker compose up --build
+   poetry run chainlit run app_minimal.py
    ```
 
 ### Local Development Setup
@@ -111,29 +121,75 @@ Tahecho uses a multi-agent system built with LangChain and LangGraph:
 
 2. **Install dependencies**
    ```bash
-   pip install -r requirements.txt
+   poetry install
    ```
 
 3. **Set up Neo4j (optional - for full mode)**
 
-   **Option A: Local Neo4j with Docker**
-   ```bash
-   docker run \
-     --name neo4j \
-     -p 7474:7474 -p 7687:7687 \
-     -e NEO4J_AUTH=neo4j/test1234 \
-     -e NEO4J_PLUGINS='["apoc"]' \
-     neo4j:latest
-   ```
-
-   **Option B: Neo4j AuraDB (Cloud)**
+   **Neo4j AuraDB (Cloud)**
    - Create account at https://neo4j.com/cloud/platform/aura-graph-database/
    - Update connection string in your `.env` file
+   
+   **Local Neo4j Installation**
+   - Download and install Neo4j Desktop from https://neo4j.com/download/
+   - Create a new database with APOC plugin enabled
+   - Update connection details in your `.env` file
 
 4. **Run the application**
    ```bash
-   chainlit run app.py
+   poetry run chainlit run app.py
    ```
+
+## Jira MCP Integration
+
+Tahecho uses the [MCP Atlassian server](https://github.com/sooperset/mcp-atlassian) to provide seamless integration with Jira. 
+
+### Setup Requirements
+
+**IMPORTANT**: You must start the MCP-Atlassian server before using Jira features:
+
+```bash
+# Make sure your .env file contains your Jira credentials:
+# JIRA_INSTANCE_URL=https://your-company.atlassian.net
+# JIRA_USERNAME=your.email@company.com
+# JIRA_API_TOKEN=your_api_token
+
+# Start the MCP server (it reads from .env automatically)
+uvx mcp-atlassian
+```
+
+Keep this server running in a separate terminal while using Tahecho.
+
+### Supported Operations
+- **Search tickets**: Find tickets assigned to you or in specific projects
+- **Create tickets**: Generate new tasks, bugs, or stories
+- **Get ticket details**: Retrieve comprehensive information about specific tickets
+- **Update tickets**: Modify status, assignees, and other fields
+- **JQL queries**: Use Jira Query Language for advanced filtering
+
+### Example Queries
+```
+User: What tickets are assigned to me?
+Assistant: You currently have 3 tickets assigned to you:
+1. PGA-123: Implement new feature (In Progress)
+2. PGA-456: Fix bug in login (To Do)  
+3. PGA-789: Review documentation (Done)
+
+User: Please create a new ticket in project PGA with the content: Implement user authentication feature
+Assistant: Successfully created ticket PGA-124: Implement user authentication feature
+
+User: Show me all tickets in the PGA project
+Assistant: Here are the current tickets in the PGA project:
+1. PGA-123: Implement new feature - Status: In Progress
+2. PGA-456: Fix bug in login - Status: To Do
+[... additional tickets]
+```
+
+### MCP Server Requirements
+The integration automatically manages the MCP Atlassian server, but requires:
+- Valid Jira Cloud credentials in your `.env` file
+- Network access to your Jira instance
+- The `uv` package manager (installed automatically with Poetry)
 
 ## Configuration
 
@@ -182,9 +238,6 @@ python demo_modes.py
 
 **Graph Database Issues:**
 ```bash
-# Check if Neo4j is running
-docker ps | grep neo4j
-
 # Test connection
 python -c "from utils.graph_db import graph_db_manager; print(graph_db_manager.connect())"
 ```
@@ -201,6 +254,19 @@ If you see "Running in limited mode" message:
 - App will still work for basic Jira operations
 - For full functionality, start Neo4j and ensure `GRAPH_DB_ENABLED=True`
 
+**Jira MCP Issues:**
+If Jira operations fail:
+1. Verify Jira credentials are correct in `.env`
+2. Test MCP server setup: `poetry run python scripts/setup_mcp_jira.py`
+3. Check network connectivity to your Jira instance
+4. Ensure `uv` is installed: `curl -LsSf https://astral.sh/uv/install.sh | sh`
+
+**Module Import Errors:**
+If you get `ModuleNotFoundError: No module named 'tahecho'`:
+- Always use `poetry run` prefix for commands
+- Example: `poetry run chainlit run app.py`
+- Don't run `chainlit run app.py` directly
+
 ## Development Workflow
 
 ### Test-Driven Development (TDD)
@@ -215,21 +281,24 @@ We follow the **Red-Green-Refactor** cycle:
 
 ```bash
 # Run all tests
-pytest
+poetry run pytest
 
 # Run with coverage
-pytest --cov=agents --cov=utils --cov-report=html
+poetry run pytest --cov=src --cov-report=html
 
 # Run specific test categories
-pytest tests/unit/          # Unit tests
-pytest tests/integration/   # Integration tests
-pytest tests/e2e/          # End-to-end tests
+poetry run pytest tests/unit/          # Unit tests
+poetry run pytest tests/integration/   # Integration tests
+poetry run pytest tests/smoke/         # Smoke tests
+
+# Test Jira MCP integration specifically
+poetry run python scripts/test_jira_integration.py
 
 # Run tests in watch mode (requires pytest-watch)
-ptw
+poetry run ptw
 
 # Run tests with verbose output
-pytest -v
+poetry run pytest -v
 ```
 
 ### Test Structure
@@ -315,27 +384,29 @@ pre-commit run --all-files
 
 ## Running the Application
 
-### Docker (Production)
-```bash
-docker compose up --build
-```
-The application will be available at http://localhost:8000
-
 ### Local Development
 ```bash
-# Full mode (with Neo4j)
-chainlit run app.py
+# Standard mode - using Poetry
+poetry run chainlit run app.py
 
-# Limited mode (without Neo4j)
-chainlit run app_minimal.py
+# Development mode with auto-reload (recommended for development)
+poetry run chainlit run app.py --watch
+
+# Development with debug mode and custom port
+poetry run chainlit run app.py --watch --debug --port 8001
+
+# Minimal mode (no Neo4j required)
+poetry run chainlit run app_minimal.py
+
+# If you get "ModuleNotFoundError: No module named 'tahecho'", use Poetry
 ```
+
+The application will be available at http://localhost:8000
+
+**💡 Development Tip:** Use the `--watch` flag to automatically reload the app when you make code changes - no need to stop and restart manually!
 
 ### Stop the Application
 ```bash
-# Docker
-docker compose down
-
-# Local
 Ctrl+C
 ```
 
@@ -346,6 +417,10 @@ Ctrl+C
 | Basic Jira queries | ✅ | ✅ |
 | Issue status updates | ✅ | ✅ |
 | Task management | ✅ | ✅ |
+| **Jira MCP Integration** | ✅ | ✅ |
+| **Create/Update tickets** | ✅ | ✅ |
+| **JQL search queries** | ✅ | ✅ |
+| **Ticket details retrieval** | ✅ | ✅ |
 | Relationship analysis | ✅ | ❌ |
 | Dependency chains | ✅ | ❌ |
 | Historical changes | ✅ | ❌ |

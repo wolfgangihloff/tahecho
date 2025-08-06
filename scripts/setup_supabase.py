@@ -4,6 +4,7 @@
 import os
 import sys
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -19,27 +20,27 @@ def setup_supabase_schema():
     """Set up the Supabase database schema for document-oriented content storage."""
     print("🗄️  Setting up Supabase Database Schema")
     print("=" * 50)
-    
+
     # Check if Supabase credentials are available
-    supabase_url = os.getenv('SUPABASE_URL')
-    supabase_anon_key = os.getenv('SUPABASE_ANON_KEY')
-    
+    supabase_url = os.getenv("SUPABASE_URL")
+    supabase_anon_key = os.getenv("SUPABASE_ANON_KEY")
+
     if not supabase_url or not supabase_anon_key:
         print("❌ Missing Supabase credentials in .env file")
         print("Please set SUPABASE_URL and SUPABASE_ANON_KEY")
         return False
-    
+
     try:
         # Initialize Supabase integration
         print("📋 Initializing Supabase connection...")
         supabase = SupabaseIntegration(supabase_url, supabase_anon_key)
-        
+
         if supabase.client is None:
             print("❌ Failed to connect to Supabase")
             return False
-        
+
         print("✅ Connected to Supabase successfully")
-        
+
         # Document-oriented schema for unified content storage
         schema_sql = """
         -- Enable pgvector extension
@@ -134,60 +135,64 @@ def setup_supabase_schema():
             FOR EACH ROW
             EXECUTE FUNCTION update_updated_at_column();
         """
-        
+
         print("🔧 Creating document-oriented database schema...")
-        
+
         # Execute the schema SQL
         try:
             # Split the SQL into individual statements
-            statements = [stmt.strip() for stmt in schema_sql.split(';') if stmt.strip()]
-            
+            statements = [
+                stmt.strip() for stmt in schema_sql.split(";") if stmt.strip()
+            ]
+
             for statement in statements:
                 if statement:
                     print(f"   Executing: {statement[:50]}...")
-                    supabase.client.rpc('exec_sql', {'sql': statement}).execute()
-            
+                    supabase.client.rpc("exec_sql", {"sql": statement}).execute()
+
             print("✅ Database schema created successfully!")
-            
+
         except Exception as e:
             print(f"⚠️  Note: Some operations may have failed: {e}")
-            print("This is normal if tables already exist or if you don't have admin privileges")
-        
+            print(
+                "This is normal if tables already exist or if you don't have admin privileges"
+            )
+
         # Test the connection by trying to create a test record
         print("\n🧪 Testing database connection...")
         try:
             test_document = {
-                'title': 'Test Document',
-                'url': 'https://test.example.com/page',
-                'content': 'This is a test document for the unified content storage system.',
-                'content_preview': 'Test document for unified storage...',
-                'content_hash': 'test_hash_123',
-                'source_type': 'sitemap',
-                'source_id': 'test_sitemap_123',
-                'source_url': 'https://test.example.com/sitemap.xml',
-                'domain': 'test.example.com',
-                'organization': 'Test Org',
-                'metadata': {
-                    'language': 'en',
-                    'content_type': 'documentation',
-                    'word_count': 15
+                "title": "Test Document",
+                "url": "https://test.example.com/page",
+                "content": "This is a test document for the unified content storage system.",
+                "content_preview": "Test document for unified storage...",
+                "content_hash": "test_hash_123",
+                "source_type": "sitemap",
+                "source_id": "test_sitemap_123",
+                "source_url": "https://test.example.com/sitemap.xml",
+                "domain": "test.example.com",
+                "organization": "Test Org",
+                "metadata": {
+                    "language": "en",
+                    "content_type": "documentation",
+                    "word_count": 15,
                 },
-                'tags': ['test', 'documentation']
+                "tags": ["test", "documentation"],
             }
-            
-            result = supabase.client.table('documents').insert(test_document).execute()
+
+            result = supabase.client.table("documents").insert(test_document).execute()
             print("✅ Test document created successfully")
-            
+
             # Clean up test record
             if result.data:
-                test_id = result.data[0]['id']
-                supabase.client.table('documents').delete().eq('id', test_id).execute()
+                test_id = result.data[0]["id"]
+                supabase.client.table("documents").delete().eq("id", test_id).execute()
                 print("✅ Test document cleaned up")
-                
+
         except Exception as e:
             print(f"⚠️  Test failed: {e}")
             print("This might be due to permissions or existing schema issues")
-        
+
         print("\n🎉 Document-oriented Supabase setup completed!")
         print("\nSchema Overview:")
         print("📄 documents table - Unified storage for all content sources")
@@ -199,14 +204,16 @@ def setup_supabase_schema():
         print("\nNext steps:")
         print("1. Run: poetry run python scripts/demo_sitemap.py")
         print("2. Run: poetry run python scripts/manage_sitemaps.py list")
-        print("3. Start scraping: poetry run python scripts/manage_sitemaps.py scrape --url https://docs.aleph-alpha.com/sitemap.xml")
-        
+        print(
+            "3. Start scraping: poetry run python scripts/manage_sitemaps.py scrape --url https://docs.aleph-alpha.com/sitemap.xml"
+        )
+
         return True
-        
+
     except Exception as e:
         print(f"❌ Setup failed: {e}")
         return False
 
 
-if __name__ == '__main__':
-    setup_supabase_schema() 
+if __name__ == "__main__":
+    setup_supabase_schema()

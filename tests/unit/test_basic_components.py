@@ -23,21 +23,21 @@ mock_config = {
 }
 
 # Mock the config module
-sys.modules['config'] = Mock()
-sys.modules['config'].CONFIG = mock_config
+sys.modules["config"] = Mock()
+sys.modules["config"].CONFIG = mock_config
 
 
 def test_state_management():
     """Test the state management component."""
-    from agents.state import AgentState, create_initial_state
-    
+    from tahecho.agents.state import AgentState, create_initial_state
+
     # Test state creation
     state = create_initial_state("Test message", "test_conversation")
     assert state.user_input == "Test message"
     assert state.conversation_id == "test_conversation"
     assert len(state.messages) == 1
     assert state.messages[0].content == "Test message"
-    
+
     # Test state updates
     state.task_type = "mcp"
     state.agent_results["test_agent"] = "Test result"
@@ -48,38 +48,34 @@ def test_state_management():
 def test_imports():
     """Test that all components can be imported."""
     # Test basic imports
-    from agents.state import AgentState, create_initial_state
-    
-    # Test workflow imports (without initialization)
-    from agents.langgraph_workflow import LangGraphWorkflow
-    
     # Test manager agent imports (without initialization)
-    from agents.langchain_manager_agent import LangChainManagerAgent
+    from tahecho.agents.langchain_manager_agent import LangChainManagerAgent
+
+    # Test workflow imports (without initialization)
+    from tahecho.agents.langgraph_workflow import LangGraphWorkflow
+    from tahecho.agents.state import AgentState, create_initial_state
 
 
 def test_workflow_structure():
     """Test the workflow structure without executing it."""
-    from agents.langgraph_workflow import LangGraphWorkflow
-    
+    from tahecho.agents.langgraph_workflow import LangGraphWorkflow
+
     # Create workflow instance
     workflow = LangGraphWorkflow()
-    
+
     # Check that workflow has required components
-    assert hasattr(workflow, 'workflow')
-    assert hasattr(workflow, 'memory')
-    assert hasattr(workflow, 'app')
+    assert hasattr(workflow, "workflow")
+    assert hasattr(workflow, "memory")
+    assert hasattr(workflow, "app")
 
 
 def test_manager_agent_structure():
     """Test the manager agent structure without executing it."""
-    from agents.langchain_manager_agent import LangChainManagerAgent
-    
+    from tahecho.agents.langchain_manager_agent import LangChainManagerAgent
+
     # Create manager agent instance
     manager = LangChainManagerAgent()
-    
+
     # Check that manager has required components
-    assert hasattr(manager, 'workflow')
-    assert hasattr(manager, 'run')
-
-
- 
+    assert hasattr(manager, "workflow")
+    assert hasattr(manager, "run")

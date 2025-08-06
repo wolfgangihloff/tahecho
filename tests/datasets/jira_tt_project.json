@@ -1,0 +1,182 @@
+{
+  "name": "jira-tt-project-evaluation",
+  "description": "Evaluation dataset for Jira integration testing with TT project containing Test 1 and Test 2 issues",
+  "version": "1.0.0",
+  "project": "TT",
+  "created_date": "2024-01-01",
+  "test_cases": [
+    {
+      "id": "tt_user_assignment_search",
+      "input": "What tickets are assigned to wolfgang.ihloff@aleph-alpha.com in project TT?",
+      "expected_output": {
+        "contains": [
+          "TT-1", 
+          "Test 1", 
+          "wolfgang.ihloff@aleph-alpha.com",
+          "assigned"
+        ],
+        "not_contains": [
+          "TT-2", 
+          "Test 2"
+        ],
+        "ticket_count": 1
+      },
+      "metadata": {
+        "test_type": "user_assignment_search",
+        "project": "TT",
+        "user": "wolfgang.ihloff@aleph-alpha.com",
+        "expected_tickets": ["TT-1"]
+      }
+    },
+    {
+      "id": "tt_project_all_tickets",
+      "input": "Show me all tickets in project TT",
+      "expected_output": {
+        "contains": [
+          "TT-1", 
+          "Test 1", 
+          "TT-2", 
+          "Test 2"
+        ],
+        "ticket_count": 2
+      },
+      "metadata": {
+        "test_type": "project_search",
+        "project": "TT",
+        "expected_tickets": ["TT-1", "TT-2"]
+      }
+    },
+    {
+      "id": "tt_unassigned_search",
+      "input": "Which tickets in TT project are unassigned?",
+      "expected_output": {
+        "contains": [
+          "TT-2", 
+          "Test 2", 
+          "unassigned"
+        ],
+        "not_contains": [
+          "TT-1", 
+          "wolfgang.ihloff"
+        ],
+        "ticket_count": 1
+      },
+      "metadata": {
+        "test_type": "unassigned_search",
+        "project": "TT",
+        "expected_tickets": ["TT-2"]
+      }
+    },
+    {
+      "id": "tt_ticket_details_assigned",
+      "input": "Get details for ticket TT-1",
+      "expected_output": {
+        "contains": [
+          "TT-1", 
+          "Test 1", 
+          "wolfgang.ihloff@aleph-alpha.com"
+        ]
+      },
+      "metadata": {
+        "test_type": "ticket_details",
+        "ticket_key": "TT-1",
+        "expected_assignee": "wolfgang.ihloff@aleph-alpha.com"
+      }
+    },
+    {
+      "id": "tt_ticket_details_unassigned",
+      "input": "Get details for ticket TT-2",
+      "expected_output": {
+        "contains": [
+          "TT-2", 
+          "Test 2", 
+          "unassigned"
+        ],
+        "not_contains": [
+          "wolfgang.ihloff"
+        ]
+      },
+      "metadata": {
+        "test_type": "ticket_details",
+        "ticket_key": "TT-2",
+        "expected_assignee": null
+      }
+    },
+    {
+      "id": "tt_project_completeness",
+      "input": "Are there any other tickets in TT project besides TT-1 and TT-2?",
+      "expected_output": {
+        "contains": [
+          "no other", 
+          "only", 
+          "TT-1", 
+          "TT-2", 
+          "two"
+        ],
+        "ticket_count": 2
+      },
+      "metadata": {
+        "test_type": "project_completeness_check",
+        "project": "TT",
+        "total_tickets": 2
+      }
+    },
+    {
+      "id": "tt_follow_up_username",
+      "input": "wolfgang.ihloff@aleph-alpha.com",
+      "expected_output": {
+        "contains": [
+          "TT-1", 
+          "Test 1", 
+          "wolfgang.ihloff@aleph-alpha.com"
+        ],
+        "context_type": "follow_up_username"
+      },
+      "metadata": {
+        "test_type": "follow_up_response",
+        "context": "username_clarification",
+        "requires_previous_context": true
+      }
+    },
+    {
+      "id": "tt_follow_up_project",
+      "input": "TT",
+      "expected_output": {
+        "contains": [
+          "TT-1", 
+          "TT-2", 
+          "Test 1", 
+          "Test 2"
+        ],
+        "context_type": "follow_up_project"
+      },
+      "metadata": {
+        "test_type": "follow_up_response",
+        "context": "project_clarification",
+        "requires_previous_context": true
+      }
+    }
+  ],
+  "evaluation_criteria": {
+    "contains_weight": 0.4,
+    "not_contains_weight": 0.3,
+    "ticket_count_weight": 0.3,
+    "passing_score": 0.8
+  },
+  "ground_truth": {
+    "project": "TT",
+    "tickets": {
+      "TT-1": {
+        "summary": "Test 1",
+        "assignee": "wolfgang.ihloff@aleph-alpha.com",
+        "status": "Open"
+      },
+      "TT-2": {
+        "summary": "Test 2", 
+        "assignee": null,
+        "status": "Open"
+      }
+    },
+    "total_tickets": 2
+  }
+}

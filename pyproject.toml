@@ -25,6 +25,7 @@ supabase = "^2.3.0"
 
 # Jira integration
 atlassian-python-api = "*"
+mcp = "*"
 
 # OpenAI
 openai = "*"
