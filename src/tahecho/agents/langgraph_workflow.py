@@ -1,7 +1,9 @@
 import logging
 import re
+from contextlib import asynccontextmanager
 from typing import Annotated, Any, Dict, Optional, TypedDict
 
+import chainlit as cl
 from langchain.chat_models import init_chat_model
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate
@@ -9,13 +11,34 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, StateGraph
 
 from config import CONFIG
-from tahecho.agents.langchain_graph_agent import langchain_graph_agent
-from tahecho.agents.langchain_mcp_agent import langchain_mcp_agent
+# Focusing on Jira MCP agent only
 from tahecho.agents.jira_mcp_agent import jira_mcp_agent
 from tahecho.agents.state import AgentState, create_initial_state
-from tahecho.agents.task_classifier import task_classifier
+from tahecho.agents.task_classifier import get_task_classifier
 
 logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def optional_step(name: str, step_type: str = "tool"):
+    """Create an optional Chainlit step that works even without Chainlit context."""
+    step = None
+    try:
+        step = cl.Step(name=name, type=step_type)
+        await step.__aenter__()
+        yield step
+    except Exception:
+        # No Chainlit context available, yield a dummy object
+        class DummyStep:
+            def __setattr__(self, name, value):
+                pass
+        yield DummyStep()
+    finally:
+        if step:
+            try:
+                await step.__aexit__(None, None, None)
+            except Exception:
+                pass
 
 
 class LangGraphWorkflow:
@@ -44,9 +67,7 @@ class LangGraphWorkflow:
         # Add nodes
         workflow.add_node("classify_task", self._classify_task)
         workflow.add_node("route_to_agent", self._route_to_agent)
-        workflow.add_node("execute_mcp_agent", self._execute_mcp_agent)
-        workflow.add_node("execute_jira_mcp_agent", self._execute_jira_mcp_agent)
-        workflow.add_node("execute_graph_agent", self._execute_graph_agent)
+        workflow.add_node("execute_jira_agent", self._execute_jira_agent)
         workflow.add_node("generate_final_response", self._generate_final_response)
 
         # Add edges
@@ -56,31 +77,34 @@ class LangGraphWorkflow:
             "route_to_agent",
             self._should_continue,
             {
-                "mcp": "execute_mcp_agent",
-                "jira": "execute_jira_mcp_agent",
-                "graph": "execute_graph_agent",
+                "jira": "execute_jira_agent",
                 "general": "generate_final_response",
                 "end": END,
             },
         )
-        workflow.add_edge("execute_mcp_agent", "generate_final_response")
-        workflow.add_edge("execute_jira_mcp_agent", "generate_final_response")
-        workflow.add_edge("execute_graph_agent", "generate_final_response")
+        workflow.add_edge("execute_jira_agent", "generate_final_response")
         workflow.add_edge("generate_final_response", END)
 
         return workflow
 
-    def _classify_task(self, state: AgentState) -> AgentState:
+    async def _classify_task(self, state: AgentState) -> AgentState:
         """Classify the task to determine which agent should handle it."""
-        try:
-            from tahecho.agents.task_classifier import TaskClassifier
-
-            classifier = TaskClassifier()
-            return classifier.classify_task(state)
-        except Exception as e:
-            logger.error(f"Task classification failed: {e}")
-            state.task_type = "general"
-            return state
+        async with optional_step("Task Classification", "tool") as step:
+            step.input = state.user_input
+            try:
+                classifier = get_task_classifier()
+                result_state = classifier.classify_task(state)
+                
+                step.output = f"Task classified as: {result_state.task_type}"
+                logger.info(f"Task classified as: {result_state.task_type}")
+                
+                return result_state
+            except Exception as e:
+                error_msg = f"Task classification failed: {e}"
+                logger.error(error_msg)
+                step.output = error_msg
+                state.task_type = "general"
+                return state
 
     def _route_to_agent(self, state: AgentState) -> AgentState:
         """Route to the appropriate agent based on task classification."""
@@ -88,58 +112,60 @@ class LangGraphWorkflow:
         # The routing logic is handled by the conditional edges
         return state
 
-    def _execute_mcp_agent(self, state: AgentState) -> AgentState:
-        """Execute the MCP agent for direct Jira operations."""
-        try:
-            return langchain_mcp_agent.execute(state)
-        except Exception as e:
-            logger.error(f"MCP agent execution failed: {e}")
-            state.agent_results["mcp_agent"] = f"Error: {str(e)}"
-            return state
-
-    def _execute_jira_mcp_agent(self, state: AgentState) -> AgentState:
-        """Execute the Jira MCP agent for Jira-specific operations."""
-        try:
-            return jira_mcp_agent.execute(state)
-        except Exception as e:
-            logger.error(f"Jira MCP agent execution failed: {e}")
-            state.agent_results["jira_mcp_agent"] = f"Error: {str(e)}"
-            return state
-
-    def _execute_graph_agent(self, state: AgentState) -> AgentState:
-        """Execute the Graph agent for complex reasoning."""
-        try:
-            return langchain_graph_agent.execute(state)
-        except Exception as e:
-            logger.error(f"Graph agent execution failed: {e}")
-            state.agent_results["graph_agent"] = f"Error: {str(e)}"
-            return state
-
-    def _generate_final_response(self, state: AgentState) -> AgentState:
-        """Generate the final response based on agent results."""
-        try:
-            # Check if we have agent errors first
-            agent_errors = []
-            for agent, result in state.agent_results.items():
-                if isinstance(result, str) and result.startswith("Error:"):
-                    agent_errors.append((agent, result))
-
-            if agent_errors:
-                # Log detailed errors for debugging
-                for agent, error in agent_errors:
-                    logger.error(f"{agent} failed: {error}")
-
-                # Generate user-friendly error message
-                user_message = self._create_user_friendly_error_message(
-                    agent_errors, state.user_input
-                )
-                state.final_answer = user_message
-                state.messages.append(AIMessage(content=user_message))
+    async def _execute_jira_agent(self, state: AgentState) -> AgentState:
+        """Execute the Jira MCP agent for Jira operations."""
+        async with optional_step("Jira Agent", "run") as step:
+            step.input = state.user_input
+            try:
+                logger.info("Executing Jira agent for Jira operations")
+                result_state = jira_mcp_agent.execute(state)
+                
+                if "jira_mcp_agent" in result_state.agent_results:
+                    step.output = result_state.agent_results["jira_mcp_agent"]
+                else:
+                    step.output = "Jira agent completed successfully"
+                
+                return result_state
+            except Exception as e:
+                error_msg = f"Jira agent execution failed: {str(e)}"
+                logger.error(error_msg)
+                step.output = error_msg
+                state.agent_results["jira_mcp_agent"] = f"Error: {str(e)}"
                 return state
 
-            # Create a prompt for generating the final response
-            final_prompt = ChatPromptTemplate.from_template(
-                """
+    # Graph agent removed - focusing on MCP agents only
+
+    async def _generate_final_response(self, state: AgentState) -> AgentState:
+        """Generate the final response based on agent results."""
+        async with optional_step("Final Response Generation", "llm") as step:
+            step.input = {
+                "user_input": state.user_input,
+                "agent_results": state.agent_results
+            }
+            try:
+                # Check if we have agent errors first
+                agent_errors = []
+                for agent, result in state.agent_results.items():
+                    if isinstance(result, str) and result.startswith("Error:"):
+                        agent_errors.append((agent, result))
+
+                if agent_errors:
+                    # Log detailed errors for debugging
+                    for agent, error in agent_errors:
+                        logger.error(f"{agent} failed: {error}")
+
+                    # Generate user-friendly error message
+                    user_message = self._create_user_friendly_error_message(
+                        agent_errors, state.user_input
+                    )
+                    step.output = user_message
+                    state.final_answer = user_message
+                    state.messages.append(AIMessage(content=user_message))
+                    return state
+
+                # Create a prompt for generating the final response
+                final_prompt = ChatPromptTemplate.from_template(
+                    """
 You are the final response generator for a Jira management system. Your job is to create a clear, user-friendly response based on the agent results.
 
 User's original request: {user_input}
@@ -158,47 +184,49 @@ Please generate a final response that:
 
 Final response:
 """
-            )
-
-            # Create the chain
-            chain = final_prompt | self.llm
-
-            # Format agent results
-            agent_results_text = (
-                "\n".join(
-                    [
-                        f"- {agent}: {result}"
-                        for agent, result in state.agent_results.items()
-                    ]
                 )
-                if state.agent_results
-                else "No specific agent results available."
-            )
 
-            # Generate final response
-            result = chain.invoke(
-                {
-                    "user_input": state.user_input,
-                    "agent_results": agent_results_text,
-                    "current_agent": state.current_agent or "none",
-                }
-            )
+                # Create the chain
+                chain = final_prompt | self.llm
 
-            # Update state
-            state.final_answer = result.content
-            state.messages.append(AIMessage(content=result.content))
+                # Format agent results
+                agent_results_text = (
+                    "\n".join(
+                        [
+                            f"- {agent}: {result}"
+                            for agent, result in state.agent_results.items()
+                        ]
+                    )
+                    if state.agent_results
+                    else "No specific agent results available."
+                )
 
-            return state
+                # Generate final response
+                result = chain.invoke(
+                    {
+                        "user_input": state.user_input,
+                        "agent_results": agent_results_text,
+                        "current_agent": state.current_agent or "none",
+                    }
+                )
 
-        except Exception as e:
-            logger.error(f"Final response generation failed: {e}")
-            # Fallback response
-            fallback_response = self._create_user_friendly_error_message(
-                [("system", str(e))], state.user_input
-            )
-            state.final_answer = fallback_response
-            state.messages.append(AIMessage(content=fallback_response))
-            return state
+                # Update state and step output
+                state.final_answer = result.content
+                step.output = result.content
+                state.messages.append(AIMessage(content=result.content))
+
+                return state
+
+            except Exception as e:
+                logger.error(f"Final response generation failed: {e}")
+                # Fallback response
+                fallback_response = self._create_user_friendly_error_message(
+                    [("system", str(e))], state.user_input
+                )
+                step.output = fallback_response
+                state.final_answer = fallback_response
+                state.messages.append(AIMessage(content=fallback_response))
+                return state
 
     def _create_user_friendly_error_message(
         self, agent_errors: list, user_input: str
@@ -222,8 +250,7 @@ Final response:
                     error_types.append("api_auth")
             elif "connection" in error_str or "timeout" in error_str:
                 error_types.append("connection")
-            elif "neo4j" in error_str or "graph" in error_str:
-                error_types.append("graph_db")
+            # Graph DB support removed
             else:
                 error_types.append("general")
 
@@ -232,8 +259,7 @@ Final response:
             return "I'm having trouble connecting to my language processing service. This might be a temporary issue. Please try again in a moment."
         elif "jira_auth" in error_types:
             return "I'm unable to access your Jira information right now. Please check your Jira credentials and try again."
-        elif "graph_db" in error_types:
-            return "I'm having trouble accessing the relationship database. You can still ask basic questions about your tasks."
+        # Graph DB error handling removed
         elif "connection" in error_types:
             return "I'm experiencing connection issues with one of my services. Please try again in a moment."
         elif "api_auth" in error_types:
@@ -247,9 +273,9 @@ Final response:
             if state.task_type == "jira":
                 return "jira"
             elif state.task_type == "mcp":
-                return "mcp"
-            elif state.task_type == "graph":
-                return "graph"
+                # Redirect MCP requests to Jira agent since it handles all Jira operations
+                logger.info("MCP task detected, routing to Jira agent")
+                return "jira"
             elif state.task_type == "general":
                 return "general"
             else:
@@ -258,15 +284,34 @@ Final response:
             logger.error(f"Routing decision failed: {e}")
             return "general"
 
-    def execute(self, user_input: str, conversation_id: Optional[str] = None) -> str:
+    async def execute(self, user_input: str, conversation_id: Optional[str] = None) -> str:
         """Execute the workflow with the given user input."""
         try:
-            # Create initial state
-            initial_state = create_initial_state(user_input, conversation_id)
+            config = {"configurable": {"thread_id": conversation_id or "default"}}
+            
+            # Get existing conversation state to include message history
+            try:
+                existing_state = self.app.get_state(config)
+                if existing_state and existing_state.values:
+                    # Build on existing conversation
+                    initial_state = AgentState(**existing_state.values)
+                    # Add new user message to the conversation
+                    initial_state.user_input = user_input
+                    initial_state.messages.append(HumanMessage(content=user_input))
+                    # Reset task classification for new input
+                    initial_state.task_type = None
+                    initial_state.current_agent = None
+                    initial_state.final_answer = None
+                else:
+                    # Create fresh state for new conversation
+                    initial_state = create_initial_state(user_input, conversation_id)
+            except Exception as e:
+                logger.warning(f"Could not retrieve existing state: {e}")
+                # Fallback to fresh state
+                initial_state = create_initial_state(user_input, conversation_id)
 
             # Execute the workflow
-            config = {"configurable": {"thread_id": conversation_id or "default"}}
-            result = self.app.invoke(initial_state, config)
+            result = await self.app.ainvoke(initial_state, config)
 
             # Handle different result types
             if hasattr(result, "final_answer"):

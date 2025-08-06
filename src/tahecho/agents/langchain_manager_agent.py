@@ -9,7 +9,7 @@ class LangChainManagerAgent:
     def __init__(self):
         self.workflow = langgraph_workflow
 
-    def run(
+    async def run(
         self,
         user_input: str,
         reset: bool = False,
@@ -28,7 +28,7 @@ class LangChainManagerAgent:
         """
         try:
             # Execute the workflow
-            result = self.workflow.execute(user_input, conversation_id)
+            result = await self.workflow.execute(user_input, conversation_id)
             return result
 
         except Exception as e:

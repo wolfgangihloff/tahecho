@@ -205,28 +205,7 @@ class TestAgentExecution:
         except Exception as e:
             pytest.fail(f"MCP agent execution failed: {str(e)}")
 
-    def test_graph_agent_execution(self):
-        """Test Graph agent execution."""
-        try:
-            from tahecho.agents.langchain_graph_agent import langchain_graph_agent
-            from tahecho.agents.state import create_initial_state
-
-            # Create test state
-            state = create_initial_state(
-                "Show dependencies for ABC-123", conversation_id="test_conv"
-            )
-
-            # Execute Graph agent
-            result_state = langchain_graph_agent.execute(state)
-
-            # Check result
-            assert hasattr(result_state, "agent_results")
-            assert "graph_agent" in result_state.agent_results
-            assert isinstance(result_state.agent_results["graph_agent"], str)
-
-            print(
-                f"✅ Graph agent result: {result_state.agent_results['graph_agent'][:100]}..."
-            )
+    # Graph agent test removed - functionality disabled
 
         except Exception as e:
             pytest.fail(f"Graph agent execution failed: {str(e)}")

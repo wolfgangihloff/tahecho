@@ -63,20 +63,18 @@ python tests/smoke/test_setup.py
 ### 4. Start Neo4j (Optional - for Full Mode)
 If you want full functionality with graph database:
 
-#### Using Docker:
-```bash
-docker run \
-  --name neo4j \
-  -p 7474:7474 -p 7687:7687 \
-  -e NEO4J_AUTH=neo4j/test1234 \
-  -e NEO4J_PLUGINS='["apoc"]' \
-  neo4j:latest
-```
+#### Neo4j AuraDB (Cloud - Recommended):
+1. Create account at https://neo4j.com/cloud/platform/aura-graph-database/
+2. Create a new database instance
+3. Note down the connection URI, username, and password
+4. Update your `.env` file with the connection details
 
-#### Using Docker Compose:
-```bash
-docker-compose up -d neo4j
-```
+#### Local Neo4j Installation:
+1. Download and install Neo4j Desktop from https://neo4j.com/download/
+2. Create a new database project
+3. Install APOC plugin if needed
+4. Start the database
+5. Update your `.env` file with the local connection details
 
 ### 5. Run the Application
 
@@ -109,9 +107,10 @@ NEO4J_PASSWORD=your_password
 ## Troubleshooting
 
 ### Graph Database Connection Issues
-1. Check if Neo4j is running: `docker ps | grep neo4j`
-2. Verify connection settings in `.env`
-3. Test connection: `python -c "from utils.graph_db import graph_db_manager; print(graph_db_manager.connect())"`
+1. Verify connection settings in `.env`
+2. Test connection: `python -c "from utils.graph_db import graph_db_manager; print(graph_db_manager.connect())"`
+3. For local installations, ensure Neo4j Desktop is running
+4. For AuraDB, check your internet connection and credentials
 
 ### App Won't Start
 1. Verify all required environment variables are set

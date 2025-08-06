@@ -123,12 +123,12 @@ class TestAgentStateIntegration:
 
         # Act
         state.agent_results["mcp_agent"] = "MCP result"
-        state.agent_results["graph_agent"] = "Graph result"
+        state.agent_results["jira_mcp_agent"] = "Jira result"
 
         # Assert
         assert len(state.agent_results) == 2
         assert state.agent_results["mcp_agent"] == "MCP result"
-        assert state.agent_results["graph_agent"] == "Graph result"
+        assert state.agent_results["jira_mcp_agent"] == "Jira result"
 
     def test_state_task_classification_flow(self):
         """Test task classification flow through state."""

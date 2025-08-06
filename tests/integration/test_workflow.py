@@ -75,48 +75,7 @@ class TestLangGraphWorkflow:
         assert result is not None
         assert "Final response" in result
 
-    @patch("agents.langgraph_workflow.ChatOpenAI")
-    @patch("agents.langgraph_workflow.MemorySaver")
-    @patch("agents.task_classifier.task_classifier")
-    @patch("agents.langchain_graph_agent.langchain_graph_agent")
-    def test_workflow_graph_execution(
-        self, mock_graph_agent, mock_classifier, mock_memory, mock_chat_openai
-    ):
-        """Test workflow execution for Graph tasks."""
-        # Arrange
-        mock_llm = Mock()
-        mock_chat_openai.return_value = mock_llm
-        mock_memory_instance = Mock()
-        mock_memory.return_value = mock_memory_instance
-
-        # Mock task classifier
-        mock_classifier_instance = Mock()
-        mock_classifier_instance.classify_task.return_value = create_initial_state(
-            "test"
-        )
-        mock_classifier_instance.classify_task.return_value.task_type = "graph"
-        mock_classifier.return_value = mock_classifier_instance
-
-        # Mock Graph agent
-        mock_graph_instance = Mock()
-        mock_graph_instance.execute.return_value = create_initial_state("test")
-        mock_graph_instance.execute.return_value.agent_results = {
-            "graph_agent": "Graph result"
-        }
-        mock_graph_instance.execute.return_value.final_answer = "Final Graph result"
-        mock_graph_agent.return_value = mock_graph_instance
-
-        # Mock final response generation
-        mock_llm.invoke.return_value.content = "Final response"
-
-        workflow = LangGraphWorkflow()
-
-        # Act
-        result = workflow.execute("Why is task DTS-53 blocked?", "test_conv")
-
-        # Assert
-        assert result is not None
-        assert "Final response" in result
+    # Graph agent test removed - functionality disabled
 
     @patch("agents.langgraph_workflow.ChatOpenAI")
     @patch("agents.langgraph_workflow.MemorySaver")

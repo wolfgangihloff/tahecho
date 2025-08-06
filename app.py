@@ -5,8 +5,7 @@ import locale
 import logging
 from config import CONFIG
 import os
-from tahecho.utils.utils import store_changelogs, store_issues
-from tahecho.utils.graph_db import graph_db_manager
+# Graph database functionality removed - focusing on MCP agent only
 from tahecho.utils.error_handling import setup_error_handling
 
 # Set up logging
@@ -68,29 +67,7 @@ logger.info("OpenAI client initialized successfully")
 
 @cl.on_chat_start
 async def start():
-    # Check if graph database is enabled via environment variable
-    graph_db_enabled = os.getenv("GRAPH_DB_ENABLED", "True").lower() == "true"
-    
-    if graph_db_enabled:
-        # Attempt to connect to graph database
-        graph_connected = graph_db_manager.connect()
-    else:
-        logger.info("Graph database disabled via environment variable")
-        graph_connected = False
-    
-    if graph_connected:
-        logger.info("Graph database connected successfully")
-        # Store data in graph database
-        store_issues()
-        store_changelogs()
-    else:
-        logger.info("Graph database not available - running in limited mode")
-        # Update system message to reflect limited functionality
-        global SYSTEM_MESSAGE
-        SYSTEM_MESSAGE += """
-
-Note: Advanced graph-based analysis is not currently available. For complex relationship queries or historical analysis, please ensure Neo4j is running and accessible.
-"""
+    logger.info("Starting Tahecho with MCP agents")
     
     # Initialize chat with system message
     cl.user_session.set("messages", [
@@ -103,10 +80,6 @@ Note: Advanced graph-based analysis is not currently available. For complex rela
         if system_locale.startswith('de')
         else "Welcome to Tahecho! How can I assist you today?"
     )
-    
-    # Add information about graph database status
-    if not graph_connected:
-        welcome_message += "\n\nNote: Running in limited mode - advanced graph analysis features are not available."
     
     await cl.Message(welcome_message).send()
 
@@ -124,7 +97,7 @@ async def main(message: cl.Message):
         cl.user_session.set("conversation_id", conversation_id)
 
     # Execute the LangGraph workflow
-    response = langchain_manager_agent.run(message.content, conversation_id=conversation_id)
+    response = await langchain_manager_agent.run(message.content, conversation_id=conversation_id)
     await cl.Message(content=response).send()
     
     # Add assistant's response to history

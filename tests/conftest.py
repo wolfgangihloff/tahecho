@@ -77,15 +77,6 @@ def mock_jira_client():
 
 
 @pytest.fixture
-def mock_neo4j_graph():
-    """Mock Neo4j graph connection."""
-    with patch("py2neo.Graph") as mock_graph:
-        mock_instance = Mock()
-        mock_graph.return_value = mock_instance
-        yield mock_instance
-
-
-@pytest.fixture
 def sample_jira_issue():
     """Sample Jira issue data for testing."""
     return {
@@ -112,18 +103,6 @@ def sample_jira_issue():
             "labels": ["test", "documentation"],
             "issuelinks": [],
         },
-    }
-
-
-@pytest.fixture
-def sample_neo4j_issue():
-    """Sample Neo4j issue node for testing."""
-    return {
-        "key": "DTS-123",
-        "summary": "Test Issue",
-        "description": "This is a test issue",
-        "created": "2024-01-01T10:00:00.000+0000",
-        "updated": "2024-01-01T10:00:00.000+0000",
     }
 
 

@@ -90,24 +90,25 @@ Tahecho uses a multi-agent system built with LangChain and LangGraph:
    poetry run python tests/smoke/test_setup.py
    ```
 
-5. **Run the application**
+5. **Start the MCP-Atlassian server** (required for Jira integration)
+   ```bash
+   # Option 1: Use the helper script (recommended)
+   python start_mcp_server.py
+   
+   # Option 2: Start manually
+   uvx mcp-atlassian
+   ```
+
+6. **Run the application**
    ```bash
    # Using Poetry (recommended)
    poetry run chainlit run app.py
    
+   # For development with auto-reload
+   poetry run chainlit run app.py --watch
+   
    # Or minimal mode (no Neo4j required)
    poetry run chainlit run app_minimal.py
-   ```
-
-### Using Docker (Production)
-
-1. Make sure you have Docker and Docker Compose installed on your system
-2. Clone this repository
-3. Create a `.env` file based on `.env.example`
-   * For Jira API tokens, go to: https://id.atlassian.com/manage-profile/security/api-tokens
-4. Build and start the Docker container:
-   ```bash
-   docker compose up --build
    ```
 
 ### Local Development Setup
@@ -125,19 +126,14 @@ Tahecho uses a multi-agent system built with LangChain and LangGraph:
 
 3. **Set up Neo4j (optional - for full mode)**
 
-   **Option A: Local Neo4j with Docker**
-   ```bash
-   docker run \
-     --name neo4j \
-     -p 7474:7474 -p 7687:7687 \
-     -e NEO4J_AUTH=neo4j/test1234 \
-     -e NEO4J_PLUGINS='["apoc"]' \
-     neo4j:latest
-   ```
-
-   **Option B: Neo4j AuraDB (Cloud)**
+   **Neo4j AuraDB (Cloud)**
    - Create account at https://neo4j.com/cloud/platform/aura-graph-database/
    - Update connection string in your `.env` file
+   
+   **Local Neo4j Installation**
+   - Download and install Neo4j Desktop from https://neo4j.com/download/
+   - Create a new database with APOC plugin enabled
+   - Update connection details in your `.env` file
 
 4. **Run the application**
    ```bash
@@ -146,7 +142,23 @@ Tahecho uses a multi-agent system built with LangChain and LangGraph:
 
 ## Jira MCP Integration
 
-Tahecho uses the [MCP Atlassian server](https://github.com/sooperset/mcp-atlassian) to provide seamless integration with Jira. This allows for:
+Tahecho uses the [MCP Atlassian server](https://github.com/sooperset/mcp-atlassian) to provide seamless integration with Jira. 
+
+### Setup Requirements
+
+**IMPORTANT**: You must start the MCP-Atlassian server before using Jira features:
+
+```bash
+# Make sure your .env file contains your Jira credentials:
+# JIRA_INSTANCE_URL=https://your-company.atlassian.net
+# JIRA_USERNAME=your.email@company.com
+# JIRA_API_TOKEN=your_api_token
+
+# Start the MCP server (it reads from .env automatically)
+uvx mcp-atlassian
+```
+
+Keep this server running in a separate terminal while using Tahecho.
 
 ### Supported Operations
 - **Search tickets**: Find tickets assigned to you or in specific projects
@@ -226,9 +238,6 @@ python demo_modes.py
 
 **Graph Database Issues:**
 ```bash
-# Check if Neo4j is running
-docker ps | grep neo4j
-
 # Test connection
 python -c "from utils.graph_db import graph_db_manager; print(graph_db_manager.connect())"
 ```
@@ -375,26 +384,29 @@ pre-commit run --all-files
 
 ## Running the Application
 
-### Docker (Production)
-```bash
-docker compose up --build
-```
-The application will be available at http://localhost:8000
-
 ### Local Development
 ```bash
-# Full mode (with Neo4j) - using Poetry
+# Standard mode - using Poetry
 poetry run chainlit run app.py
+
+# Development mode with auto-reload (recommended for development)
+poetry run chainlit run app.py --watch
+
+# Development with debug mode and custom port
+poetry run chainlit run app.py --watch --debug --port 8001
+
+# Minimal mode (no Neo4j required)
+poetry run chainlit run app_minimal.py
 
 # If you get "ModuleNotFoundError: No module named 'tahecho'", use Poetry
 ```
 
+The application will be available at http://localhost:8000
+
+**💡 Development Tip:** Use the `--watch` flag to automatically reload the app when you make code changes - no need to stop and restart manually!
+
 ### Stop the Application
 ```bash
-# Docker
-docker compose down
-
-# Local
 Ctrl+C
 ```
 

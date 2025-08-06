@@ -165,26 +165,7 @@ class TestOptionalGraphDatabaseFeatures:
         except Exception as e:
             pytest.fail(f"Agent tools failed without graph DB: {e}")
 
-    def test_graph_agent_adapts_behavior(self):
-        """Test that graph agent adapts its behavior based on graph DB availability."""
-        try:
-            from tahecho.agents.langchain_graph_agent import LangChainGraphAgent
-            from tahecho.agents.state import create_initial_state
-
-            # Test with graph DB unavailable
-            with patch("agents.langchain_graph_agent.graph_db_manager") as mock_manager:
-                mock_manager.is_available.return_value = False
-
-                agent = LangChainGraphAgent()
-                state = create_initial_state("Test query")
-
-                result_state = agent.execute(state)
-
-                # Should provide helpful response about limited functionality
-                assert "graph_agent" in result_state.agent_results
-                response = result_state.agent_results["graph_agent"]
-                assert isinstance(response, str)
-                assert len(response) > 0
+    # Graph agent test removed - functionality disabled
 
         except Exception as e:
             pytest.fail(f"Graph agent adaptation failed: {e}")

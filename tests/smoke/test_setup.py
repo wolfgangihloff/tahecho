@@ -24,10 +24,7 @@ def test_environment_variables():
     }
 
     optional_vars = {
-        "GRAPH_DB_ENABLED": "Graph Database Enabled",
-        "NEO4J_URI": "Neo4j URI",
-        "NEO4J_USERNAME": "Neo4j Username",
-        "NEO4J_PASSWORD": "Neo4j Password",
+        # Graph database variables removed - using MCP agents only
     }
 
     missing_required = []
@@ -100,33 +97,6 @@ def test_chainlit_setup():
         return False
 
 
-def test_graph_database():
-    """Test optional graph database connection."""
-    print("\n🔍 Testing Graph Database Connection...")
-
-    try:
-        from tahecho.utils.graph_db import GraphDatabase
-
-        # Check if graph database is enabled
-        graph_enabled = os.getenv("GRAPH_DB_ENABLED", "false").lower() == "true"
-
-        if not graph_enabled:
-            print("⚠️  Graph database disabled - skipping test")
-            return True
-
-        # Test connection
-        graph_db = GraphDatabase()
-        if graph_db.is_connected():
-            print("✅ Graph database connection successful")
-            return True
-        else:
-            print("❌ Graph database connection failed")
-            return False
-
-    except Exception as e:
-        print(f"❌ Graph database test failed: {str(e)}")
-        return False
-
 
 def test_jira_integration():
     """Test Jira integration setup."""
@@ -177,7 +147,6 @@ def main():
         ("Environment Variables", test_environment_variables),
         ("LangChain Setup", test_langchain_setup),
         ("Chainlit Setup", test_chainlit_setup),
-        ("Graph Database", test_graph_database),
         ("Jira Integration", test_jira_integration),
         ("Agent Setup", test_agent_setup),
     ]

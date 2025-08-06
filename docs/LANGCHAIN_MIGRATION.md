@@ -134,7 +134,7 @@ This will test:
 The new implementation uses the same configuration as before:
 - `config.py`: OpenAI API settings
 - Environment variables: Jira credentials
-- Docker Compose: Service configuration
+- Poetry dependency management for local development
 
 ## Backward Compatibility
 
