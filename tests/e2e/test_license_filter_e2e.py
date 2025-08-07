@@ -7,10 +7,11 @@ These tests simulate real user interactions in a browser.
 import pytest
 import json
 from pathlib import Path
+from typing import Dict, Any
 
 
 @pytest.fixture(scope="session")
-def test_sbom_data():
+def test_sbom_data() -> Dict[str, Any]:
     """Create sample SBOM data for testing."""
     return {
         "metadata": {
@@ -55,7 +56,7 @@ def test_sbom_data():
 
 
 @pytest.mark.asyncio
-async def test_license_filter_real_interaction(page, test_sbom_data):
+async def test_license_filter_real_interaction(page: Any, test_sbom_data: Dict[str, Any]) -> None:
     """Test the complete license filter workflow with real user interactions."""
     
     # Navigate to the page served by our HTTP server
@@ -211,7 +212,7 @@ async def test_license_filter_real_interaction(page, test_sbom_data):
 
 
 @pytest.mark.asyncio
-async def test_license_filter_debugging(page):
+async def test_license_filter_debugging(page: Any) -> None:
     """Debug test to understand what's happening with the license filter."""
     
     await page.goto("http://localhost:8000/public/index.html")
