@@ -1,5 +1,8 @@
 # Tahecho - AI-Powered Jira Assistant
 
+> 📋 **[View SBOM Reports & BSI TR-03183 Compliance Dashboard](https://wolfgang.ihloff.github.io/tahecho/)**  
+> Complete Software Bill of Materials, security compliance status, and dependency tracking.
+
 Tahecho is your new product team member that likes to make process effective, easy and help everyone on the team, it wears the hats of scrum master, agile coach, product owner or project manager.
 
 ## Features
@@ -25,6 +28,12 @@ Tahecho provides powerful Jira management through natural language:
 * **Jira Cloud** - Full API integration using MCP Atlassian server
 * **OpenAI GPT-4** - For natural language processing
 * **MCP (Model Context Protocol)** - For structured Jira interactions
+
+## 🔒 Security & Compliance
+
+Tahecho maintains comprehensive security compliance with automated SBOM generation and BSI TR-03183 compliance.
+
+📋 **[View Complete SBOM Documentation](docs/SBOM_COMPLIANCE.md)** - Detailed compliance information, dashboard access, and technical implementation details.
 
 ## Architecture
 

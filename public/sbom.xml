@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
-<bom xmlns="http://cyclonedx.org/schema/bom/1.6" serialNumber="urn:uuid:7010ad25-c6f2-4fef-a717-66e1305e8a8e" version="1">
+<bom xmlns="http://cyclonedx.org/schema/bom/1.6" serialNumber="urn:uuid:874e7460-b17a-44a9-b049-8028c857d0b4" version="1">
   <metadata>
-    <timestamp>2025-08-07T10:34:34.042311+00:00</timestamp>
+    <timestamp>2025-08-07T15:28:58.335499+00:00</timestamp>
     <tools>
       <components>
         <component type="application">
@@ -11186,6 +11186,28 @@
         </reference>
       </externalReferences>
     </component>
+    <component type="library" bom-ref="outcome@1.3.0.post0">
+      <name>outcome</name>
+      <version>1.3.0.post0</version>
+      <description>Capture the outcome of Python function calls.</description>
+      <purl>pkg:pypi/outcome@1.3.0.post0</purl>
+      <externalReferences>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/outcome/#outcome-1.3.0.post0-py2.py3-none-any.whl</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">e771c5ce06d1415e356078d3bdd68523f284b4ce5419828922b6871e65eda82b</hash>
+          </hashes>
+        </reference>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/outcome/#outcome-1.3.0.post0.tar.gz</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">9dcf02e65f2971b80047b377468e72a268e15c0af3cf1238e6ff14f7f91143b8</hash>
+          </hashes>
+        </reference>
+      </externalReferences>
+    </component>
     <component type="library" bom-ref="packageurl-python@0.17.3">
       <name>packageurl-python</name>
       <version>0.17.3</version>
@@ -12089,6 +12111,73 @@
           </hashes>
         </reference>
       </externalReferences>
+    </component>
+    <component type="library" bom-ref="playwright@1.54.0">
+      <name>playwright</name>
+      <version>1.54.0</version>
+      <description>A high-level API to automate web browsers</description>
+      <purl>pkg:pypi/playwright@1.54.0</purl>
+      <externalReferences>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/playwright/#playwright-1.54.0-py3-none-macosx_10_13_x86_64.whl</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">bf3b845af744370f1bd2286c2a9536f474cc8a88dc995b72ea9a5be714c9a77d</hash>
+          </hashes>
+        </reference>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/playwright/#playwright-1.54.0-py3-none-macosx_11_0_arm64.whl</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">780928b3ca2077aea90414b37e54edd0c4bbb57d1aafc42f7aa0b3fd2c2fac02</hash>
+          </hashes>
+        </reference>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/playwright/#playwright-1.54.0-py3-none-macosx_11_0_universal2.whl</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">81d0b6f28843b27f288cfe438af0a12a4851de57998009a519ea84cee6fbbfb9</hash>
+          </hashes>
+        </reference>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/playwright/#playwright-1.54.0-py3-none-manylinux1_x86_64.whl</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">09919f45cc74c64afb5432646d7fef0d19fff50990c862cb8d9b0577093f40cc</hash>
+          </hashes>
+        </reference>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/playwright/#playwright-1.54.0-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">13ae206c55737e8e3eae51fb385d61c0312eeef31535643bb6232741b41b6fdc</hash>
+          </hashes>
+        </reference>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/playwright/#playwright-1.54.0-py3-none-win32.whl</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">0b108622ffb6906e28566f3f31721cd57dda637d7e41c430287804ac01911f56</hash>
+          </hashes>
+        </reference>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/playwright/#playwright-1.54.0-py3-none-win_amd64.whl</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">9e5aee9ae5ab1fdd44cd64153313a2045b136fcbcfb2541cc0a3d909132671a2</hash>
+          </hashes>
+        </reference>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/playwright/#playwright-1.54.0-py3-none-win_arm64.whl</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">a975815971f7b8dca505c441a4c56de1aeb56a211290f8cc214eeef5524e8d75</hash>
+          </hashes>
+        </reference>
+      </externalReferences>
+      <properties>
+        <property name="cdx:poetry:group">dev</property>
+      </properties>
     </component>
     <component type="library" bom-ref="pluggy@1.6.0">
       <name>pluggy</name>
@@ -13884,6 +13973,28 @@
         </reference>
       </externalReferences>
     </component>
+    <component type="library" bom-ref="pyee@13.0.0">
+      <name>pyee</name>
+      <version>13.0.0</version>
+      <description>A rough port of Node.js's EventEmitter to Python with a few tricks of its own</description>
+      <purl>pkg:pypi/pyee@13.0.0</purl>
+      <externalReferences>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/pyee/#pyee-13.0.0-py3-none-any.whl</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">48195a3cddb3b1515ce0695ed76036b5ccc2ef3a9f963ff9f77aec0139845498</hash>
+          </hashes>
+        </reference>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/pyee/#pyee-13.0.0.tar.gz</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">b391e3c5a434d1f5118a25615001dbc8f669cf410ab67d04c4d4e07c55481c37</hash>
+          </hashes>
+        </reference>
+      </externalReferences>
+    </component>
     <component type="library" bom-ref="pyflakes@3.4.0">
       <name>pyflakes</name>
       <version>3.4.0</version>
@@ -14009,6 +14120,35 @@
         </reference>
       </externalReferences>
     </component>
+    <component type="library" bom-ref="pysocks@1.7.1">
+      <name>pysocks</name>
+      <version>1.7.1</version>
+      <description>A Python SOCKS client module. See https://github.com/Anorov/PySocks for more information.</description>
+      <purl>pkg:pypi/pysocks@1.7.1</purl>
+      <externalReferences>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/pysocks/#PySocks-1.7.1-py27-none-any.whl</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">08e69f092cc6dbe92a0fdd16eeb9b9ffbc13cadfe5ca4c7bd92ffb078b293299</hash>
+          </hashes>
+        </reference>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/pysocks/#PySocks-1.7.1-py3-none-any.whl</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">2725bd0a9925919b9b51739eea5f9e2bae91e83288108a9ad338b2e3a4435ee5</hash>
+          </hashes>
+        </reference>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/pysocks/#PySocks-1.7.1.tar.gz</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">3f8804571ebe159c380ac6de37643bb4685970655d3bba243530d6558b799aa0</hash>
+          </hashes>
+        </reference>
+      </externalReferences>
+    </component>
     <component type="library" bom-ref="pytest@8.4.1">
       <name>pytest</name>
       <version>8.4.1</version>
@@ -14059,6 +14199,28 @@
         <property name="cdx:poetry:group">dev</property>
       </properties>
     </component>
+    <component type="library" bom-ref="pytest-base-url@2.1.0">
+      <name>pytest-base-url</name>
+      <version>2.1.0</version>
+      <description>pytest plugin for URL based testing</description>
+      <purl>pkg:pypi/pytest-base-url@2.1.0</purl>
+      <externalReferences>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/pytest-base-url/#pytest_base_url-2.1.0-py3-none-any.whl</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">3ad15611778764d451927b2a53240c1a7a591b521ea44cebfe45849d2d2812e6</hash>
+          </hashes>
+        </reference>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/pytest-base-url/#pytest_base_url-2.1.0.tar.gz</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">02748589a54f9e63fcbe62301d6b0496da0d10231b753e950c63e03aee745d45</hash>
+          </hashes>
+        </reference>
+      </externalReferences>
+    </component>
     <component type="library" bom-ref="pytest-cov@4.1.0">
       <name>pytest-cov</name>
       <version>4.1.0</version>
@@ -14102,6 +14264,31 @@
           <comment>from legacy-api</comment>
           <hashes>
             <hash alg="SHA-256">159e9edac4c451ce77a5cdb9fc5d1100708d2dd4ba3c3df572f14097351af80e</hash>
+          </hashes>
+        </reference>
+      </externalReferences>
+      <properties>
+        <property name="cdx:poetry:group">dev</property>
+      </properties>
+    </component>
+    <component type="library" bom-ref="pytest-playwright@0.7.0">
+      <name>pytest-playwright</name>
+      <version>0.7.0</version>
+      <description>A pytest wrapper with fixtures for Playwright to automate web browsers</description>
+      <purl>pkg:pypi/pytest-playwright@0.7.0</purl>
+      <externalReferences>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/pytest-playwright/#pytest_playwright-0.7.0-py3-none-any.whl</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">2516d0871fa606634bfe32afbcc0342d68da2dbff97fe3459849e9c428486da2</hash>
+          </hashes>
+        </reference>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/pytest-playwright/#pytest_playwright-0.7.0.tar.gz</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">b3f2ea514bbead96d26376fac182f68dcd6571e7cb41680a89ff1673c05d60b6</hash>
           </hashes>
         </reference>
       </externalReferences>
@@ -14214,6 +14401,28 @@
           <comment>from legacy-api</comment>
           <hashes>
             <hash alg="SHA-256">7a68db60c8bfb82e460637fa4750727b45af1d5e2ed215593f917f64694d34fe</hash>
+          </hashes>
+        </reference>
+      </externalReferences>
+    </component>
+    <component type="library" bom-ref="python-slugify@8.0.4">
+      <name>python-slugify</name>
+      <version>8.0.4</version>
+      <description>A Python slugify application that also handles Unicode</description>
+      <purl>pkg:pypi/python-slugify@8.0.4</purl>
+      <externalReferences>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/python-slugify/#python-slugify-8.0.4.tar.gz</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">59202371d1d05b54a9e7720c5e038f928f45daaffe41dd10822f3907b937c856</hash>
+          </hashes>
+        </reference>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/python-slugify/#python_slugify-8.0.4-py2.py3-none-any.whl</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">276540b79961052b66b7d116620b36518847f52d5fd9e3a70164fc8c50faa6b8</hash>
           </hashes>
         </reference>
       </externalReferences>
@@ -16703,6 +16912,31 @@
         <property name="cdx:poetry:group">main</property>
       </properties>
     </component>
+    <component type="library" bom-ref="selenium@4.34.2">
+      <name>selenium</name>
+      <version>4.34.2</version>
+      <description>Official Python bindings for Selenium WebDriver</description>
+      <purl>pkg:pypi/selenium@4.34.2</purl>
+      <externalReferences>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/selenium/#selenium-4.34.2-py3-none-any.whl</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">ea208f7db9e3b26e58c4a817ea9dd29454576d6ea55937d754df079ad588e1ad</hash>
+          </hashes>
+        </reference>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/selenium/#selenium-4.34.2.tar.gz</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">0f6d147595f08c6d4bad87b34c39dcacb4650aedc78e3956c8eac1bb752a3854</hash>
+          </hashes>
+        </reference>
+      </externalReferences>
+      <properties>
+        <property name="cdx:poetry:group">dev</property>
+      </properties>
+    </component>
     <component type="library" bom-ref="service-identity@24.2.0">
       <name>service-identity</name>
       <version>24.2.0</version>
@@ -17436,6 +17670,28 @@
         </reference>
       </externalReferences>
     </component>
+    <component type="library" bom-ref="text-unidecode@1.3">
+      <name>text-unidecode</name>
+      <version>1.3</version>
+      <description>The most basic Text::Unidecode port</description>
+      <purl>pkg:pypi/text-unidecode@1.3</purl>
+      <externalReferences>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/text-unidecode/#text-unidecode-1.3.tar.gz</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">bad6603bb14d279193107714b288be206cac565dfa49aa5b105294dd5c4aab93</hash>
+          </hashes>
+        </reference>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/text-unidecode/#text_unidecode-1.3-py2.py3-none-any.whl</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">1311f10e8b895935241623731c2ba64f4c455287888b18189350b67134a822e8</hash>
+          </hashes>
+        </reference>
+      </externalReferences>
+    </component>
     <component type="library" bom-ref="tiktoken@0.9.0">
       <name>tiktoken</name>
       <version>0.9.0</version>
@@ -18072,6 +18328,50 @@
         </reference>
       </externalReferences>
     </component>
+    <component type="library" bom-ref="trio@0.30.0">
+      <name>trio</name>
+      <version>0.30.0</version>
+      <description>A friendly Python library for async concurrency and I/O</description>
+      <purl>pkg:pypi/trio@0.30.0</purl>
+      <externalReferences>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/trio/#trio-0.30.0-py3-none-any.whl</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">3bf4f06b8decf8d3cf00af85f40a89824669e2d033bb32469d34840edcfc22a5</hash>
+          </hashes>
+        </reference>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/trio/#trio-0.30.0.tar.gz</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">0781c857c0c81f8f51e0089929a26b5bb63d57f927728a5586f7e36171f064df</hash>
+          </hashes>
+        </reference>
+      </externalReferences>
+    </component>
+    <component type="library" bom-ref="trio-websocket@0.12.2">
+      <name>trio-websocket</name>
+      <version>0.12.2</version>
+      <description>WebSocket library for Trio</description>
+      <purl>pkg:pypi/trio-websocket@0.12.2</purl>
+      <externalReferences>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/trio-websocket/#trio_websocket-0.12.2-py3-none-any.whl</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">df605665f1db533f4a386c94525870851096a223adcb97f72a07e8b4beba45b6</hash>
+          </hashes>
+        </reference>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/trio-websocket/#trio_websocket-0.12.2.tar.gz</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">22c72c436f3d1e264d0910a3951934798dcc5b00ae56fc4ee079d46c7cf20fae</hash>
+          </hashes>
+        </reference>
+      </externalReferences>
+    </component>
     <component type="library" bom-ref="twisted@25.5.0">
       <name>twisted</name>
       <version>25.5.0</version>
@@ -18225,6 +18525,9 @@
           </hashes>
         </reference>
       </externalReferences>
+      <properties>
+        <property name="cdx:python:package:required-extra">socks</property>
+      </properties>
     </component>
     <component type="library" bom-ref="uvicorn@0.35.0">
       <name>uvicorn</name>
@@ -18690,6 +18993,28 @@
           <comment>from legacy-api</comment>
           <hashes>
             <hash alg="SHA-256">ecb3d768f32202af770477b8b65f318fa4f566c22948673a977b00d589dd80f6</hash>
+          </hashes>
+        </reference>
+      </externalReferences>
+    </component>
+    <component type="library" bom-ref="websocket-client@1.8.0">
+      <name>websocket-client</name>
+      <version>1.8.0</version>
+      <description>WebSocket client for Python with low level API options</description>
+      <purl>pkg:pypi/websocket-client@1.8.0</purl>
+      <externalReferences>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/websocket-client/#websocket_client-1.8.0-py3-none-any.whl</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">17b44cc997f5c498e809b22cdf2d9c7a9e71c02c8cc2b6c56e7c2d1239bfa526</hash>
+          </hashes>
+        </reference>
+        <reference type="distribution">
+          <url>https://pypi.org/simple/websocket-client/#websocket_client-1.8.0.tar.gz</url>
+          <comment>from legacy-api</comment>
+          <hashes>
+            <hash alg="SHA-256">3239df9f44da632f96012472805d40a23281a991027ce11d2f45a6f24ac4c3da</hash>
           </hashes>
         </reference>
       </externalReferences>
@@ -22984,6 +23309,9 @@
     <dependency ref="opentelemetry-util-http@0.55b1"/>
     <dependency ref="orjson@3.11.0"/>
     <dependency ref="ormsgpack@1.10.0"/>
+    <dependency ref="outcome@1.3.0.post0">
+      <dependency ref="attrs@25.3.0"/>
+    </dependency>
     <dependency ref="packageurl-python@0.17.3"/>
     <dependency ref="packaging@24.2"/>
     <dependency ref="pansi@2024.11.0">
@@ -23003,6 +23331,10 @@
       <dependency ref="pyparsing@3.2.3"/>
     </dependency>
     <dependency ref="platformdirs@4.3.8"/>
+    <dependency ref="playwright@1.54.0">
+      <dependency ref="greenlet@3.2.3"/>
+      <dependency ref="pyee@13.0.0"/>
+    </dependency>
     <dependency ref="pluggy@1.6.0"/>
     <dependency ref="postgrest@1.1.1">
       <dependency ref="deprecation@2.1.0"/>
@@ -23061,6 +23393,9 @@
       <dependency ref="typing-inspection@0.4.1"/>
     </dependency>
     <dependency ref="pydispatcher@2.0.7"/>
+    <dependency ref="pyee@13.0.0">
+      <dependency ref="typing-extensions@4.14.1"/>
+    </dependency>
     <dependency ref="pyflakes@3.4.0"/>
     <dependency ref="pygments@2.19.2"/>
     <dependency ref="pyjwt@2.10.1"/>
@@ -23070,8 +23405,13 @@
     </dependency>
     <dependency ref="pyparsing@3.2.3"/>
     <dependency ref="pypydispatcher@2.1.2"/>
+    <dependency ref="pysocks@1.7.1"/>
     <dependency ref="pytest-asyncio@0.23.8">
       <dependency ref="pytest@8.4.1"/>
+    </dependency>
+    <dependency ref="pytest-base-url@2.1.0">
+      <dependency ref="pytest@8.4.1"/>
+      <dependency ref="requests@2.32.4"/>
     </dependency>
     <dependency ref="pytest-cov@4.1.0">
       <dependency ref="coverage@7.9.2"/>
@@ -23079,6 +23419,12 @@
     </dependency>
     <dependency ref="pytest-mock@3.14.1">
       <dependency ref="pytest@8.4.1"/>
+    </dependency>
+    <dependency ref="pytest-playwright@0.7.0">
+      <dependency ref="playwright@1.54.0"/>
+      <dependency ref="pytest-base-url@2.1.0"/>
+      <dependency ref="pytest@8.4.1"/>
+      <dependency ref="python-slugify@8.0.4"/>
     </dependency>
     <dependency ref="pytest-watch@4.2.0">
       <dependency ref="colorama@0.4.6"/>
@@ -23101,6 +23447,9 @@
       <dependency ref="simple-websocket@1.1.0"/>
     </dependency>
     <dependency ref="python-multipart@0.0.18"/>
+    <dependency ref="python-slugify@8.0.4">
+      <dependency ref="text-unidecode@1.3"/>
+    </dependency>
     <dependency ref="python-socketio@5.13.0">
       <dependency ref="bidict@0.23.1"/>
       <dependency ref="python-engineio@4.12.2"/>
@@ -23160,6 +23509,14 @@
       <dependency ref="twisted@25.5.0"/>
       <dependency ref="w3lib@2.3.1"/>
       <dependency ref="zope-interface@7.2"/>
+    </dependency>
+    <dependency ref="selenium@4.34.2">
+      <dependency ref="certifi@2025.7.14"/>
+      <dependency ref="trio-websocket@0.12.2"/>
+      <dependency ref="trio@0.30.0"/>
+      <dependency ref="typing-extensions@4.14.1"/>
+      <dependency ref="urllib3@2.5.0"/>
+      <dependency ref="websocket-client@1.8.0"/>
     </dependency>
     <dependency ref="service-identity@24.2.0">
       <dependency ref="attrs@25.3.0"/>
@@ -23224,11 +23581,13 @@
       <dependency ref="neo4j@5.28.1"/>
       <dependency ref="networkx@3.5"/>
       <dependency ref="openai@1.96.1"/>
+      <dependency ref="playwright@1.54.0"/>
       <dependency ref="pre-commit@3.8.0"/>
       <dependency ref="py2neo@2021.2.4"/>
       <dependency ref="pytest-asyncio@0.23.8"/>
       <dependency ref="pytest-cov@4.1.0"/>
       <dependency ref="pytest-mock@3.14.1"/>
+      <dependency ref="pytest-playwright@0.7.0"/>
       <dependency ref="pytest-watch@4.2.0"/>
       <dependency ref="pytest@8.4.1"/>
       <dependency ref="python-dotenv@1.1.1"/>
@@ -23236,9 +23595,11 @@
       <dependency ref="pyyaml@6.0.2"/>
       <dependency ref="requests@2.32.4"/>
       <dependency ref="scrapy@2.13.3"/>
+      <dependency ref="selenium@4.34.2"/>
       <dependency ref="supabase@2.17.0"/>
     </dependency>
     <dependency ref="tenacity@8.5.0"/>
+    <dependency ref="text-unidecode@1.3"/>
     <dependency ref="tiktoken@0.9.0">
       <dependency ref="regex@2024.11.6"/>
       <dependency ref="requests@2.32.4"/>
@@ -23304,6 +23665,19 @@
       <dependency ref="pydantic@2.11.7"/>
       <dependency ref="tenacity@8.5.0"/>
     </dependency>
+    <dependency ref="trio-websocket@0.12.2">
+      <dependency ref="outcome@1.3.0.post0"/>
+      <dependency ref="trio@0.30.0"/>
+      <dependency ref="wsproto@1.2.0"/>
+    </dependency>
+    <dependency ref="trio@0.30.0">
+      <dependency ref="attrs@25.3.0"/>
+      <dependency ref="cffi@1.17.1"/>
+      <dependency ref="idna@3.10"/>
+      <dependency ref="outcome@1.3.0.post0"/>
+      <dependency ref="sniffio@1.3.1"/>
+      <dependency ref="sortedcontainers@2.4.0"/>
+    </dependency>
     <dependency ref="twisted@25.5.0">
       <dependency ref="attrs@25.3.0"/>
       <dependency ref="automat@25.4.16"/>
@@ -23323,7 +23697,9 @@
       <dependency ref="typing-extensions@4.14.1"/>
     </dependency>
     <dependency ref="uri-template@1.3.0"/>
-    <dependency ref="urllib3@2.5.0"/>
+    <dependency ref="urllib3@2.5.0">
+      <dependency ref="pysocks@1.7.1"/>
+    </dependency>
     <dependency ref="uvicorn@0.35.0">
       <dependency ref="click@8.2.1"/>
       <dependency ref="h11@0.16.0"/>
@@ -23339,6 +23715,7 @@
       <dependency ref="anyio@4.9.0"/>
     </dependency>
     <dependency ref="webcolors@24.11.1"/>
+    <dependency ref="websocket-client@1.8.0"/>
     <dependency ref="websockets@15.0.1"/>
     <dependency ref="wrapt@1.17.2"/>
     <dependency ref="wsproto@1.2.0">

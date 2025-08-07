@@ -53,6 +53,9 @@ pytest-mock = "*"
 pytest-asyncio = "*"
 pytest-watch = "*"
 coverage = "*"
+selenium = "*"
+playwright = "*"
+pytest-playwright = "*"
 
 # Code quality
 black = "*"
@@ -66,6 +69,10 @@ cyclonedx-py = "*"
 
 [tool.poetry.scripts]
 generate-sbom = "scripts.generate_sbom:main"
+generate-comprehensive-sbom = "scripts.comprehensive_sbom:main"
+enhance-sbom-licenses = "scripts.enhance_sbom_licenses:main"
+clean-license-data = "scripts.clean_license_data:main"
+validate-sbom-quality = "scripts.validate_sbom_quality:main"
 
 [build-system]
 requires = ["poetry-core"]

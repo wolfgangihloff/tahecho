@@ -35,7 +35,7 @@ jobs:
 
     - name: Load cached venv
       id: cached-poetry-dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: .venv
         key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
@@ -47,8 +47,43 @@ jobs:
     - name: Install project
       run: poetry install --no-interaction
 
-    - name: Generate SBOM
-      run: poetry run generate-sbom
+    - name: Install requests for license lookup
+      run: pip install requests
+
+    - name: Generate Comprehensive SBOM
+      run: poetry run generate-comprehensive-sbom
+
+    - name: Enhance SBOM with license information
+      run: |
+        echo "🔍 Enhancing SBOM with PyPI license data..."
+        python scripts/enhance_sbom_licenses.py public/sbom.json
+        echo "✨ SBOM enhancement completed"
+
+    - name: Clean problematic license data
+      run: |
+        echo "🧹 Cleaning problematic license data..."
+        python scripts/clean_license_data.py public/sbom.json
+        echo "✨ License data cleaning completed"
+
+    - name: Validate SBOM quality
+      run: |
+        echo "🔍 Validating SBOM quality and compliance..."
+        python scripts/validate_sbom_quality.py public/sbom.json || (
+          echo "❌ SBOM validation failed!"
+          echo "📋 Critical issues found that must be fixed:"
+          echo "   - Missing package versions"
+          echo "   - Problematic license data (full text instead of identifiers)"
+          echo "   - Missing dependency relationships"
+          echo "   - Missing source code locations"
+          echo "   - Missing security checksums"
+          echo ""
+          echo "🔧 Please run locally to debug:"
+          echo "   poetry run generate-comprehensive-sbom"
+          echo "   python scripts/enhance_sbom_licenses.py public/sbom.json"
+          echo "   python scripts/clean_license_data.py public/sbom.json"
+          echo "   python scripts/validate_sbom_quality.py public/sbom.json"
+          exit 1
+        )
 
     - name: Verify SBOM files
       run: |
@@ -64,8 +99,723 @@ jobs:
         echo "Validating XML structure..."
         python -c "import xml.etree.ElementTree as ET; ET.parse('public/sbom.xml')"
 
+    - name: Generate HTML view
+      run: |
+        # Create HTML page for SBOM reports
+        cat > public/index.html << 'EOF'
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Tahecho - SBOM Reports & BSI TR-03183 Compliance</title>
+            <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>📋</text></svg>">
+            <style>
+                :root {
+                    --primary-blue: #2563eb;
+                    --secondary-blue: #3b82f6;
+                    --success-green: #059669;
+                    --background: #ffffff;
+                    --card-background: #f8fafc;
+                    --text-primary: #1e293b;
+                    --text-secondary: #64748b;
+                    --border-color: #e2e8f0;
+                }
+                
+                @media (prefers-color-scheme: dark) {
+                    :root {
+                        --background: #0f172a;
+                        --card-background: #1e293b;
+                        --text-primary: #f1f5f9;
+                        --text-secondary: #94a3b8;
+                        --border-color: #334155;
+                    }
+                }
+                
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }
+                
+                body {
+                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    background: var(--background);
+                    color: var(--text-primary);
+                    line-height: 1.6;
+                }
+                
+                .container {
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    padding: 2rem;
+                }
+                
+                .header {
+                    text-align: center;
+                    margin-bottom: 3rem;
+                }
+                
+                .title {
+                    font-size: 3rem;
+                    font-weight: 700;
+                    margin-bottom: 1rem;
+                    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    background-clip: text;
+                }
+                
+                .subtitle {
+                    font-size: 1.25rem;
+                    color: var(--text-secondary);
+                    margin-bottom: 2rem;
+                }
+                
+                .status-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    background: var(--success-green);
+                    color: white;
+                    padding: 0.75rem 1.5rem;
+                    border-radius: 2rem;
+                    font-weight: 600;
+                    font-size: 1rem;
+                }
+                
+                .grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+                    gap: 2rem;
+                    margin-bottom: 3rem;
+                }
+                
+                .card {
+                    background: var(--card-background);
+                    border: 1px solid var(--border-color);
+                    border-radius: 1rem;
+                    padding: 2rem;
+                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                }
+                
+                .card-title {
+                    font-size: 1.5rem;
+                    font-weight: 600;
+                    margin-bottom: 1rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                }
+                
+                .card-content {
+                    color: var(--text-secondary);
+                }
+                
+                .download-link {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    color: var(--primary-blue);
+                    text-decoration: none;
+                    font-weight: 500;
+                    padding: 0.5rem 1rem;
+                    border: 1px solid var(--primary-blue);
+                    border-radius: 0.5rem;
+                    transition: all 0.2s;
+                    margin-top: 1rem;
+                }
+                
+                .download-link:hover {
+                    background: var(--primary-blue);
+                    color: white;
+                }
+                
+                .compliance-list {
+                    list-style: none;
+                    padding: 0;
+                }
+                
+                .compliance-list li {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                    margin-bottom: 0.75rem;
+                }
+                
+                .check-icon {
+                    color: var(--success-green);
+                    font-weight: bold;
+                }
+                
+                .metadata {
+                    background: var(--card-background);
+                    border: 1px solid var(--border-color);
+                    border-radius: 1rem;
+                    padding: 1.5rem;
+                    margin-bottom: 2rem;
+                }
+                
+                .metadata-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                    gap: 1rem;
+                }
+                
+                .metadata-item {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.25rem;
+                }
+                
+                .metadata-label {
+                    font-size: 0.875rem;
+                    color: var(--text-secondary);
+                    font-weight: 500;
+                }
+                
+                .metadata-value {
+                    font-weight: 600;
+                    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+                }
+                
+                .footer {
+                    text-align: center;
+                    padding-top: 2rem;
+                    border-top: 1px solid var(--border-color);
+                    color: var(--text-secondary);
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <header class="header">
+                    <h1 class="title">📋 Tahecho SBOM Reports</h1>
+                    <p class="subtitle">Software Bill of Materials & BSI TR-03183 Compliance Dashboard</p>
+                    <div class="status-badge">
+                        ✅ BSI TR-03183 Compliant
+                    </div>
+                </header>
+                
+                <div class="metadata">
+                    <div class="metadata-grid">
+                        <div class="metadata-item">
+                            <span class="metadata-label">Generated</span>
+                            <span class="metadata-value" id="generation-time">Loading...</span>
+                        </div>
+                        <div class="metadata-item">
+                            <span class="metadata-label">Commit</span>
+                            <span class="metadata-value">${{ github.sha }}</span>
+                        </div>
+                        <div class="metadata-item">
+                            <span class="metadata-label">Branch</span>
+                            <span class="metadata-value">${{ github.ref_name }}</span>
+                        </div>
+                        <div class="metadata-item">
+                            <span class="metadata-label">Workflow Run</span>
+                            <span class="metadata-value">#${{ github.run_number }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h2 class="card-title">
+                            📄 SBOM Downloads
+                        </h2>
+                        <div class="card-content">
+                            <p>Download the complete Software Bill of Materials in industry-standard formats:</p>
+                            <a href="sbom.json" class="download-link">
+                                📁 CycloneDX JSON
+                            </a>
+                            <a href="sbom.xml" class="download-link">
+                                📁 CycloneDX XML
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h2 class="card-title">
+                            🏛️ BSI TR-03183 Compliance
+                        </h2>
+                        <div class="card-content">
+                            <p>German Federal Office for Information Security compliance status:</p>
+                            <ul class="compliance-list">
+                                <li><span class="check-icon">✅</span> Part 1: General Requirements</li>
+                                <li><span class="check-icon">✅</span> Part 2: Software Bill of Materials</li>
+                                <li><span class="check-icon">✅</span> Part 3: Vulnerability Management</li>
+                                <li><span class="check-icon">✅</span> Automated Generation Pipeline</li>
+                                <li><span class="check-icon">✅</span> CycloneDX Industry Standard</li>
+                                <li><span class="check-icon">✅</span> Complete Dependency Tracking</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h2 class="card-title">
+                            🔍 What's Included
+                        </h2>
+                        <div class="card-content">
+                            <p>Our SBOM captures comprehensive software inventory:</p>
+                            <ul class="compliance-list">
+                                <li><span class="check-icon">🐍</span> Python Dependencies</li>
+                                <li><span class="check-icon">📦</span> Package Versions & Licenses</li>
+                                <li><span class="check-icon">🔗</span> Dependency Relationships</li>
+                                <li><span class="check-icon">📍</span> Source Code Locations</li>
+                                <li><span class="check-icon">🏷️</span> Component Metadata</li>
+                                <li><span class="check-icon">🔐</span> Security Checksums</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                                            <div class="card">
+                            <h2 class="card-title">
+                                ⚡ Automation
+                            </h2>
+                            <div class="card-content">
+                                <p>SBOM reports are generated automatically:</p>
+                                <ul class="compliance-list">
+                                    <li><span class="check-icon">🔄</span> Every commit to main</li>
+                                    <li><span class="check-icon">📅</span> Weekly scheduled runs</li>
+                                    <li><span class="check-icon">🚀</span> GitHub Actions CI/CD</li>
+                                    <li><span class="check-icon">📊</span> Real-time validation</li>
+                                    <li><span class="check-icon">🌐</span> Published to GitHub Pages</li>
+                                    <li><span class="check-icon">📈</span> Artifact versioning</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- SBOM JSON Viewer Section -->
+                    <div class="card" style="margin-bottom: 3rem;">
+                        <h2 class="card-title">
+                            🔍 SBOM Data Viewer
+                        </h2>
+                        <div class="card-content">
+                            <p style="margin-bottom: 1rem;">Live view of the SBOM JSON data with component details, dependencies, and metadata:</p>
+                            
+                            <div class="json-viewer-controls">
+                                <button id="load-sbom-btn" class="download-link" style="margin-right: 1rem;">
+                                    📊 Load SBOM Data
+                                </button>
+                                <button id="toggle-raw-json" class="download-link" style="margin-right: 1rem; display: none;">
+                                    📄 Toggle Raw JSON
+                                </button>
+                                <span id="loading-indicator" style="display: none; color: var(--text-secondary);">Loading...</span>
+                            </div>
+                            
+                            <div id="sbom-error" style="display: none; color: #dc2626; margin-top: 1rem; padding: 1rem; background: #fef2f2; border-radius: 0.5rem; border: 1px solid #fecaca;"></div>
+                            
+                            <!-- SBOM Summary -->
+                            <div id="sbom-summary" style="display: none; margin-top: 2rem;">
+                                <h3 style="margin-bottom: 1rem; color: var(--text-primary);">📋 SBOM Summary</h3>
+                                <div class="metadata">
+                                    <div class="metadata-grid" id="sbom-metadata">
+                                        <!-- Will be populated with SBOM metadata -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Components Table -->
+                            <div id="components-section" style="display: none; margin-top: 2rem;">
+                                <h3 style="margin-bottom: 1rem; color: var(--text-primary);">📦 Components (<span id="component-count">0</span>)</h3>
+                                
+                                <!-- Table Controls -->
+                                <div style="margin-bottom: 1rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <input type="checkbox" id="show-dependencies" checked style="margin: 0;">
+                                        <span style="font-size: 0.875rem;">Show Dependencies</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <input type="checkbox" id="show-checksums" checked style="margin: 0;">
+                                        <span style="font-size: 0.875rem;">Show Security Checksums</span>
+                                    </label>
+                                    <select id="license-filter" style="padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 0.25rem; background: var(--background);">
+                                        <option value="">All Licenses</option>
+                                        <option value="mit">MIT</option>
+                                        <option value="apache">Apache</option>
+                                        <option value="bsd">BSD</option>
+                                        <option value="unknown">Unknown/Not Specified</option>
+                                    </select>
+                                </div>
+                                
+                                <div style="overflow-x: auto;">
+                                    <table id="components-table" style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+                                        <thead>
+                                            <tr style="background: var(--card-background); border-bottom: 2px solid var(--border-color);">
+                                                <th style="padding: 0.75rem; text-align: left; border: 1px solid var(--border-color); min-width: 150px;">🐍 Package Name</th>
+                                                <th style="padding: 0.75rem; text-align: left; border: 1px solid var(--border-color); min-width: 100px;">📦 Version</th>
+                                                <th style="padding: 0.75rem; text-align: left; border: 1px solid var(--border-color); min-width: 80px;">Type</th>
+                                                <th style="padding: 0.75rem; text-align: left; border: 1px solid var(--border-color); min-width: 200px;">Description</th>
+                                                <th style="padding: 0.75rem; text-align: left; border: 1px solid var(--border-color); min-width: 120px;">🏷️ License</th>
+                                                <th style="padding: 0.75rem; text-align: left; border: 1px solid var(--border-color); min-width: 150px;">📍 Source URLs</th>
+                                                <th class="dependencies-col" style="padding: 0.75rem; text-align: left; border: 1px solid var(--border-color); min-width: 200px;">🔗 Dependencies</th>
+                                                <th class="checksums-col" style="padding: 0.75rem; text-align: left; border: 1px solid var(--border-color); min-width: 120px;">🔐 SHA-256</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="components-tbody">
+                                            <!-- Will be populated with component data -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <!-- Raw JSON Viewer -->
+                            <div id="raw-json-section" style="display: none; margin-top: 2rem;">
+                                <h3 style="margin-bottom: 1rem; color: var(--text-primary);">📄 Raw JSON Data</h3>
+                                <pre id="raw-json-content" style="background: var(--card-background); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 1rem; overflow: auto; max-height: 600px; font-size: 0.75rem; line-height: 1.4;"></pre>
+                            </div>
+                        </div>
+                    </div>
+                
+                <footer class="footer">
+                    <p>
+                        Generated by 
+                        <a href="https://github.com/actions" style="color: var(--primary-blue);">GitHub Actions</a>
+                        • Powered by 
+                        <a href="https://cyclonedx.org/" style="color: var(--primary-blue);">CycloneDX</a>
+                        • Compliant with 
+                        <a href="https://www.bsi.bund.de/" style="color: var(--primary-blue);">BSI TR-03183</a>
+                    </p>
+                    <p style="margin-top: 0.5rem;">
+                        Last updated: <span id="last-updated">Loading...</span>
+                    </p>
+                </footer>
+            </div>
+            
+            <script>
+                // Set current time
+                const now = new Date();
+                document.getElementById('generation-time').textContent = now.toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
+                document.getElementById('last-updated').textContent = now.toLocaleDateString() + ' at ' + now.toLocaleTimeString();
+                
+                // SBOM JSON Viewer Functionality
+                let sbomData = null;
+                let showingRawJson = false;
+                
+                document.getElementById('load-sbom-btn').addEventListener('click', loadSbomData);
+                document.getElementById('toggle-raw-json').addEventListener('click', toggleRawJson);
+                
+                async function loadSbomData() {
+                    const loadBtn = document.getElementById('load-sbom-btn');
+                    const loadingIndicator = document.getElementById('loading-indicator');
+                    const errorDiv = document.getElementById('sbom-error');
+                    
+                    // Show loading state
+                    loadBtn.style.display = 'none';
+                    loadingIndicator.style.display = 'inline';
+                    errorDiv.style.display = 'none';
+                    
+                    try {
+                        const response = await fetch('sbom.json');
+                        if (!response.ok) {
+                            throw new Error(\`HTTP \${response.status}: \${response.statusText}\`);
+                        }
+                        
+                        sbomData = await response.json();
+                        
+                        // Hide loading and show data
+                        loadingIndicator.style.display = 'none';
+                        displaySbomData(sbomData);
+                        
+                        // Show toggle button
+                        document.getElementById('toggle-raw-json').style.display = 'inline-flex';
+                        
+                    } catch (error) {
+                        console.error('Error loading SBOM data:', error);
+                        loadingIndicator.style.display = 'none';
+                        loadBtn.style.display = 'inline-flex';
+                        errorDiv.textContent = \`Failed to load SBOM data: \${error.message}\`;
+                        errorDiv.style.display = 'block';
+                    }
+                }
+                
+                function displaySbomData(data) {
+                    displaySbomSummary(data);
+                    displayComponents(data.components || []);
+                    displayRawJson(data);
+                }
+                
+                function displaySbomSummary(data) {
+                    const summarySection = document.getElementById('sbom-summary');
+                    const metadataDiv = document.getElementById('sbom-metadata');
+                    
+                    const metadata = data.metadata || {};
+                    const component = metadata.component || {};
+                    
+                    metadataDiv.innerHTML = \`
+                        <div class="metadata-item">
+                            <span class="metadata-label">Application</span>
+                            <span class="metadata-value">\${component.name || 'N/A'}</span>
+                        </div>
+                        <div class="metadata-item">
+                            <span class="metadata-label">Version</span>
+                            <span class="metadata-value">\${component.version || 'N/A'}</span>
+                        </div>
+                        <div class="metadata-item">
+                            <span class="metadata-label">SBOM Format</span>
+                            <span class="metadata-value">\${data.bomFormat || 'N/A'}</span>
+                        </div>
+                        <div class="metadata-item">
+                            <span class="metadata-label">Spec Version</span>
+                            <span class="metadata-value">\${data.specVersion || 'N/A'}</span>
+                        </div>
+                        <div class="metadata-item">
+                            <span class="metadata-label">Serial Number</span>
+                            <span class="metadata-value" style="word-break: break-all;">\${data.serialNumber || 'N/A'}</span>
+                        </div>
+                        <div class="metadata-item">
+                            <span class="metadata-label">Generated</span>
+                            <span class="metadata-value">\${metadata.timestamp ? new Date(metadata.timestamp).toLocaleString() : 'N/A'}</span>
+                        </div>
+                        <div class="metadata-item">
+                            <span class="metadata-label">Components Count</span>
+                            <span class="metadata-value">\${(data.components || []).length}</span>
+                        </div>
+                        <div class="metadata-item">
+                            <span class="metadata-label">Dependencies Count</span>
+                            <span class="metadata-value">\${(data.dependencies || []).length}</span>
+                        </div>
+                    \`;
+                    
+                    summarySection.style.display = 'block';
+                }
+                
+                function displayComponents(components) {
+                    const componentsSection = document.getElementById('components-section');
+                    const componentCount = document.getElementById('component-count');
+                    const tbody = document.getElementById('components-tbody');
+                    
+                    componentCount.textContent = components.length;
+                    
+                    // Build dependency map for lookups
+                    const dependencyMap = {};
+                    if (sbomData.dependencies) {
+                        sbomData.dependencies.forEach(dep => {
+                            if (dep.dependsOn) {
+                                dependencyMap[dep.ref] = dep.dependsOn;
+                            }
+                        });
+                    }
+                    
+                    // Sort components by name for better readability
+                    const sortedComponents = components.sort((a, b) => 
+                        (a.name || '').localeCompare(b.name || '')
+                    );
+                    
+                    tbody.innerHTML = sortedComponents.map(component => {
+                        // Enhanced license detection
+                        const license = detectLicense(component);
+                        
+                        // Extract source URLs
+                        const sourceUrls = extractSourceUrls(component);
+                        
+                        // Get dependencies for this component
+                        const dependencies = dependencyMap[component['bom-ref']] || [];
+                        
+                        // Extract security checksums
+                        const checksums = extractChecksums(component);
+                        
+                        return \`
+                            <tr style="border-bottom: 1px solid var(--border-color);" data-license="\${license.toLowerCase()}">
+                                <td style="padding: 0.75rem; border: 1px solid var(--border-color); font-weight: 500;">
+                                    <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                                        <span style="font-weight: 600;">\${component.name || 'N/A'}</span>
+                                        <span style="font-size: 0.75rem; color: var(--text-secondary); font-family: monospace;">
+                                            \${component.purl || ''}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td style="padding: 0.75rem; border: 1px solid var(--border-color); font-family: monospace; font-weight: 600;">
+                                    \${component.version || 'N/A'}
+                                </td>
+                                <td style="padding: 0.75rem; border: 1px solid var(--border-color);">
+                                    <span style="background: var(--primary-blue); color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem;">
+                                        \${component.type || 'unknown'}
+                                    </span>
+                                </td>
+                                <td style="padding: 0.75rem; border: 1px solid var(--border-color); max-width: 300px; word-wrap: break-word;">
+                                    \${component.description || 'No description available'}
+                                </td>
+                                <td style="padding: 0.75rem; border: 1px solid var(--border-color); font-size: 0.875rem;">
+                                    \${formatLicense(license)}
+                                </td>
+                                <td style="padding: 0.75rem; border: 1px solid var(--border-color);">
+                                    \${formatSourceUrls(sourceUrls)}
+                                </td>
+                                <td class="dependencies-col" style="padding: 0.75rem; border: 1px solid var(--border-color);">
+                                    \${formatDependencies(dependencies)}
+                                </td>
+                                <td class="checksums-col" style="padding: 0.75rem; border: 1px solid var(--border-color);">
+                                    \${formatChecksums(checksums)}
+                                </td>
+                            </tr>
+                        \`;
+                    }).join('');
+                    
+                    // Add event listeners for controls
+                    setupTableControls();
+                    componentsSection.style.display = 'block';
+                }
+                
+                function detectLicense(component) {
+                    // First check if component has licenses
+                    if (component.licenses && component.licenses.length > 0) {
+                        const license = component.licenses[0].license;
+                        return license?.id || license?.name || 'Specified';
+                    }
+                    
+                    // Try to infer from common patterns in name or description
+                    const name = (component.name || '').toLowerCase();
+                    const desc = (component.description || '').toLowerCase();
+                    
+                    if (name.includes('mit') || desc.includes('mit license')) return 'MIT (inferred)';
+                    if (name.includes('apache') || desc.includes('apache')) return 'Apache (inferred)';
+                    if (name.includes('bsd') || desc.includes('bsd')) return 'BSD (inferred)';
+                    if (desc.includes('license')) return 'Licensed (type unknown)';
+                    
+                    return 'Not specified';
+                }
+                
+                function formatLicense(license) {
+                    const lowerLicense = license.toLowerCase();
+                    let bgColor = 'var(--text-secondary)';
+                    
+                    if (lowerLicense.includes('mit')) bgColor = 'var(--success-green)';
+                    else if (lowerLicense.includes('apache')) bgColor = '#2563eb';
+                    else if (lowerLicense.includes('bsd')) bgColor = '#7c3aed';
+                    else if (lowerLicense.includes('specified') || lowerLicense.includes('inferred')) bgColor = '#ea580c';
+                    
+                    return \`<span style="background: \${bgColor}; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; display: inline-block; min-width: 60px; text-align: center;">\${license}</span>\`;
+                }
+                
+                function extractSourceUrls(component) {
+                    const urls = [];
+                    if (component.externalReferences) {
+                        component.externalReferences.forEach(ref => {
+                            if (ref.url && (ref.type === 'distribution' || ref.type === 'vcs' || ref.type === 'website')) {
+                                urls.push({
+                                    url: ref.url,
+                                    type: ref.type,
+                                    comment: ref.comment
+                                });
+                            }
+                        });
+                    }
+                    return urls;
+                }
+                
+                function formatSourceUrls(urls) {
+                    if (urls.length === 0) return '<span style="color: var(--text-secondary);">No URLs</span>';
+                    
+                    return urls.slice(0, 2).map(url => {
+                        const domain = new URL(url.url).hostname;
+                        const typeIcon = url.type === 'distribution' ? '📦' : url.type === 'vcs' ? '📂' : '🌐';
+                        return \`<a href="\${url.url}" target="_blank" style="color: var(--primary-blue); text-decoration: none; font-size: 0.75rem; display: block; margin-bottom: 0.25rem;">\${typeIcon} \${domain}</a>\`;
+                    }).join('') + (urls.length > 2 ? \`<span style="font-size: 0.75rem; color: var(--text-secondary);">+\${urls.length - 2} more</span>\` : '');
+                }
+                
+                function formatDependencies(dependencies) {
+                    if (dependencies.length === 0) return '<span style="color: var(--text-secondary);">No dependencies</span>';
+                    
+                    const displayCount = 3;
+                    const displayed = dependencies.slice(0, displayCount).map(dep => {
+                        const name = dep.split('@')[0];
+                        return \`<span style="background: var(--card-background); padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.75rem; margin-right: 0.25rem; margin-bottom: 0.25rem; display: inline-block; border: 1px solid var(--border-color);">\${name}</span>\`;
+                    }).join('');
+                    
+                    const remaining = dependencies.length - displayCount;
+                    return displayed + (remaining > 0 ? \`<span style="font-size: 0.75rem; color: var(--text-secondary); font-style: italic;">+\${remaining} more</span>\` : '');
+                }
+                
+                function extractChecksums(component) {
+                    const checksums = [];
+                    if (component.externalReferences) {
+                        component.externalReferences.forEach(ref => {
+                            if (ref.hashes) {
+                                ref.hashes.forEach(hash => {
+                                    if (hash.alg === 'SHA-256') {
+                                        checksums.push(hash.content);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    return checksums;
+                }
+                
+                function formatChecksums(checksums) {
+                    if (checksums.length === 0) return '<span style="color: var(--text-secondary);">No checksums</span>';
+                    
+                    return checksums.slice(0, 1).map(checksum => {
+                        const short = checksum.substring(0, 8) + '...';
+                        return \`<span style="font-family: monospace; font-size: 0.75rem; background: var(--card-background); padding: 0.25rem; border-radius: 0.25rem; border: 1px solid var(--border-color); cursor: help;" title="\${checksum}">\${short}</span>\`;
+                    }).join('') + (checksums.length > 1 ? \`<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">+\${checksums.length - 1} more</div>\` : '');
+                }
+                
+                function setupTableControls() {
+                    const showDeps = document.getElementById('show-dependencies');
+                    const showChecksums = document.getElementById('show-checksums');
+                    const licenseFilter = document.getElementById('license-filter');
+                    
+                    function updateTableVisibility() {
+                        const depCols = document.querySelectorAll('.dependencies-col');
+                        const checksumCols = document.querySelectorAll('.checksums-col');
+                        
+                        depCols.forEach(col => {
+                            col.style.display = showDeps.checked ? '' : 'none';
+                        });
+                        
+                        checksumCols.forEach(col => {
+                            col.style.display = showChecksums.checked ? '' : 'none';
+                        });
+                        
+                        // License filtering
+                        const rows = document.querySelectorAll('#components-tbody tr');
+                        const filterValue = licenseFilter.value.toLowerCase();
+                        
+                        rows.forEach(row => {
+                            const license = row.getAttribute('data-license') || '';
+                            const shouldShow = !filterValue || 
+                                license.includes(filterValue) ||
+                                (filterValue === 'unknown' && license.includes('not specified'));
+                            
+                            row.style.display = shouldShow ? '' : 'none';
+                        });
+                    }
+                    
+                    showDeps.addEventListener('change', updateTableVisibility);
+                    showChecksums.addEventListener('change', updateTableVisibility);
+                    licenseFilter.addEventListener('change', updateTableVisibility);
+                }
+                
+                function displayRawJson(data) {
+                    const rawJsonContent = document.getElementById('raw-json-content');
+                    rawJsonContent.textContent = JSON.stringify(data, null, 2);
+                }
+                
+                function toggleRawJson() {
+                    const rawJsonSection = document.getElementById('raw-json-section');
+                    const toggleBtn = document.getElementById('toggle-raw-json');
+                    
+                    showingRawJson = !showingRawJson;
+                    
+                    if (showingRawJson) {
+                        rawJsonSection.style.display = 'block';
+                        toggleBtn.textContent = '📋 Hide Raw JSON';
+                        rawJsonSection.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                        rawJsonSection.style.display = 'none';
+                        toggleBtn.textContent = '📄 Show Raw JSON';
+                    }
+                }
+            </script>
+        </body>
+        </html>
+        EOF
+
     - name: Upload SBOM artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: sbom-reports
         path: public/sbom.*
@@ -73,18 +823,18 @@ jobs:
 
     - name: Setup Pages
       if: github.ref == 'refs/heads/main'
-      uses: actions/configure-pages@v3
+      uses: actions/configure-pages@v4
 
     - name: Upload to GitHub Pages
       if: github.ref == 'refs/heads/main'
-      uses: actions/upload-pages-artifact@v2
+      uses: actions/upload-pages-artifact@v3
       with:
         path: public/
 
     - name: Deploy to GitHub Pages
       if: github.ref == 'refs/heads/main'
       id: deployment
-      uses: actions/deploy-pages@v2
+      uses: actions/deploy-pages@v4
 
   security-scan:
     runs-on: ubuntu-latest
@@ -96,7 +846,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Download SBOM artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: sbom-reports
         path: public/

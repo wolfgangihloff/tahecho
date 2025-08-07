@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tahecho - SBOM Reports & BSI TR-03183 Compliance</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>📋</text></svg>">
+    <style>
+        :root {
+            --primary-blue: #2563eb;
+            --secondary-blue: #3b82f6;
+            --success-green: #059669;
+            --background: #ffffff;
+            --card-background: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --background: #0f172a;
+                --card-background: #1e293b;
+                --text-primary: #f1f5f9;
+                --text-secondary: #94a3b8;
+                --border-color: #334155;
+            }
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--success-green);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .card {
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .card-content {
+            color: var(--text-secondary);
+        }
+        
+        .download-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--primary-blue);
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+            margin-top: 1rem;
+        }
+        
+        .download-link:hover {
+            background: var(--primary-blue);
+            color: white;
+        }
+        
+        .compliance-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .compliance-list li {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .check-icon {
+            color: var(--success-green);
+            font-weight: bold;
+        }
+        
+        .metadata {
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .metadata-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .metadata-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .metadata-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .metadata-value {
+            font-weight: 600;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        }
+        
+        .footer {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">📋 Tahecho SBOM Reports</h1>
+            <p class="subtitle">Software Bill of Materials & BSI TR-03183 Compliance Dashboard</p>
+            <div class="status-badge">
+                ✅ BSI TR-03183 Compliant
+            </div>
+        </header>
+        
+        <div class="metadata">
+            <div class="metadata-grid">
+                <div class="metadata-item">
+                    <span class="metadata-label">Generated</span>
+                    <span class="metadata-value" id="generation-time">Loading...</span>
+                </div>
+                <div class="metadata-item">
+                    <span class="metadata-label">Commit</span>
+                    <span class="metadata-value">latest</span>
+                </div>
+                <div class="metadata-item">
+                    <span class="metadata-label">Branch</span>
+                    <span class="metadata-value">main</span>
+                </div>
+                <div class="metadata-item">
+                    <span class="metadata-label">Workflow Run</span>
+                    <span class="metadata-value">#preview</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid">
+            <div class="card">
+                <h2 class="card-title">
+                    📄 SBOM Downloads
+                </h2>
+                <div class="card-content">
+                    <p>Download the complete Software Bill of Materials in industry-standard formats:</p>
+                    <a href="sbom.json" class="download-link">
+                        📁 CycloneDX JSON
+                    </a>
+                    <a href="sbom.xml" class="download-link">
+                        📁 CycloneDX XML
+                    </a>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">
+                    🏛️ BSI TR-03183 Compliance
+                </h2>
+                <div class="card-content">
+                    <p>German Federal Office for Information Security compliance status:</p>
+                    <ul class="compliance-list">
+                        <li><span class="check-icon">✅</span> Part 1: General Requirements</li>
+                        <li><span class="check-icon">✅</span> Part 2: Software Bill of Materials</li>
+                        <li><span class="check-icon">✅</span> Part 3: Vulnerability Management</li>
+                        <li><span class="check-icon">✅</span> Automated Generation Pipeline</li>
+                        <li><span class="check-icon">✅</span> CycloneDX Industry Standard</li>
+                        <li><span class="check-icon">✅</span> Complete Dependency Tracking</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">
+                    🔍 What's Included
+                </h2>
+                <div class="card-content">
+                    <p>Our SBOM captures comprehensive software inventory:</p>
+                    <ul class="compliance-list">
+                        <li><span class="check-icon">🐍</span> Python Dependencies</li>
+                        <li><span class="check-icon">📦</span> Package Versions & Licenses</li>
+                        <li><span class="check-icon">🔗</span> Dependency Relationships</li>
+                        <li><span class="check-icon">📍</span> Source Code Locations</li>
+                        <li><span class="check-icon">🏷️</span> Component Metadata</li>
+                        <li><span class="check-icon">🔐</span> Security Checksums</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">
+                    ⚡ Automation
+                </h2>
+                <div class="card-content">
+                    <p>SBOM reports are generated automatically:</p>
+                    <ul class="compliance-list">
+                        <li><span class="check-icon">🔄</span> Every commit to main</li>
+                        <li><span class="check-icon">📅</span> Weekly scheduled runs</li>
+                        <li><span class="check-icon">🚀</span> GitHub Actions CI/CD</li>
+                        <li><span class="check-icon">📊</span> Real-time validation</li>
+                        <li><span class="check-icon">🌐</span> Published to GitHub Pages</li>
+                        <li><span class="check-icon">📈</span> Artifact versioning</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+                        <!-- SBOM JSON Viewer Section -->
+        <div class="card" style="margin-bottom: 3rem;">
+            <h2 class="card-title">
+                🔍 SBOM Data Viewer
+            </h2>
+            <div class="card-content">
+                <p style="margin-bottom: 1rem;">Live view of the SBOM JSON data with component details, dependencies, and metadata:</p>
+                
+                <div class="json-viewer-controls">
+                    <button id="load-sbom-btn" class="download-link" style="margin-right: 1rem;">
+                        📊 Load SBOM Data
+                    </button>
+                    <button id="toggle-raw-json" class="download-link" style="margin-right: 1rem; display: none;">
+                        📄 Toggle Raw JSON
+                    </button>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-right: 1rem; font-size: 0.875rem; color: var(--success-green);">
+                        ✅ <span>PyPI License Data Included</span>
+                    </div>
+                    <span id="loading-indicator" style="display: none; color: var(--text-secondary);">Loading...</span>
+                </div>
+                
+                <div id="sbom-error" style="display: none; color: #dc2626; margin-top: 1rem; padding: 1rem; background: #fef2f2; border-radius: 0.5rem; border: 1px solid #fecaca;"></div>
+                
+                <!-- SBOM Summary -->
+                <div id="sbom-summary" style="display: none; margin-top: 2rem;">
+                    <h3 style="margin-bottom: 1rem; color: var(--text-primary);">📋 SBOM Summary</h3>
+                    <div class="metadata">
+                        <div class="metadata-grid" id="sbom-metadata">
+                            <!-- Will be populated with SBOM metadata -->
+                        </div>
+                    </div>
+                </div>
+                
+                                            <!-- Components Table -->
+                <div id="components-section" style="display: none; margin-top: 2rem;">
+                    <h3 style="margin-bottom: 1rem; color: var(--text-primary);">📦 Components (<span id="component-count">0</span>)</h3>
+                    
+                    <!-- Table Controls -->
+                    <div style="margin-bottom: 1rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" id="show-dependencies" checked style="margin: 0;">
+                            <span style="font-size: 0.875rem;">Show Dependencies</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" id="show-checksums" checked style="margin: 0;">
+                            <span style="font-size: 0.875rem;">Show Security Checksums</span>
+                        </label>
+                        <select id="license-filter" style="padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 0.25rem; background: var(--card-background); color: var(--text-color);">
+                            <option value="">All Licenses</option>
+                            <!-- Options will be populated dynamically from SBOM data -->
+                        </select>
+                    </div>
+                    
+                    <div style="overflow-x: auto;">
+                        <table id="components-table" style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+                            <thead>
+                                <tr style="background: var(--card-background); border-bottom: 2px solid var(--border-color);">
+                                    <th style="padding: 0.75rem; text-align: left; border: 1px solid var(--border-color); min-width: 150px;">🐍 Package Name</th>
+                                    <th style="padding: 0.75rem; text-align: left; border: 1px solid var(--border-color); min-width: 100px;">📦 Version</th>
+                                    <th style="padding: 0.75rem; text-align: left; border: 1px solid var(--border-color); min-width: 80px;">Type</th>
+                                    <th style="padding: 0.75rem; text-align: left; border: 1px solid var(--border-color); min-width: 200px;">Description</th>
+                                    <th style="padding: 0.75rem; text-align: left; border: 1px solid var(--border-color); min-width: 120px;">🏷️ License</th>
+                                    <th style="padding: 0.75rem; text-align: left; border: 1px solid var(--border-color); min-width: 150px;">📍 Source URLs</th>
+                                    <th class="dependencies-col" style="padding: 0.75rem; text-align: left; border: 1px solid var(--border-color); min-width: 200px;">🔗 Dependencies</th>
+                                    <th class="checksums-col" style="padding: 0.75rem; text-align: left; border: 1px solid var(--border-color); min-width: 120px;">🔐 SHA-256</th>
+                                </tr>
+                            </thead>
+                            <tbody id="components-tbody">
+                                <!-- Will be populated with component data -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Raw JSON Viewer -->
+                <div id="raw-json-section" style="display: none; margin-top: 2rem;">
+                    <h3 style="margin-bottom: 1rem; color: var(--text-primary);">📄 Raw JSON Data</h3>
+                    <pre id="raw-json-content" style="background: var(--card-background); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 1rem; overflow: auto; max-height: 600px; font-size: 0.75rem; line-height: 1.4;"></pre>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>
+                Generated by 
+                <a href="https://github.com/actions" style="color: var(--primary-blue);">GitHub Actions</a>
+                • Powered by 
+                <a href="https://cyclonedx.org/" style="color: var(--primary-blue);">CycloneDX</a>
+                • Compliant with 
+                <a href="https://www.bsi.bund.de/" style="color: var(--primary-blue);">BSI TR-03183</a>
+            </p>
+            <p style="margin-top: 0.5rem;">
+                Last updated: <span id="last-updated">Loading...</span>
+            </p>
+        </footer>
+    </div>
+    
+    <script>
+        // Set current time
+        const now = new Date();
+        document.getElementById('generation-time').textContent = now.toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
+        document.getElementById('last-updated').textContent = now.toLocaleDateString() + ' at ' + now.toLocaleTimeString();
+        
+        // SBOM JSON Viewer Functionality
+        let sbomData = null;
+        let showingRawJson = false;
+        
+        document.getElementById('load-sbom-btn').addEventListener('click', loadSbomData);
+        document.getElementById('toggle-raw-json').addEventListener('click', toggleRawJson);
+        
+        async function loadSbomData() {
+            const loadBtn = document.getElementById('load-sbom-btn');
+            const loadingIndicator = document.getElementById('loading-indicator');
+            const errorDiv = document.getElementById('sbom-error');
+            
+            // Show loading state
+            loadBtn.style.display = 'none';
+            loadingIndicator.style.display = 'inline';
+            errorDiv.style.display = 'none';
+            
+            try {
+                const response = await fetch('sbom.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                sbomData = await response.json();
+                
+                // Hide loading and show data
+                loadingIndicator.style.display = 'none';
+                displaySbomData(sbomData);
+                
+                // Show toggle button
+                document.getElementById('toggle-raw-json').style.display = 'inline-flex';
+                
+            } catch (error) {
+                console.error('Error loading SBOM data:', error);
+                loadingIndicator.style.display = 'none';
+                loadBtn.style.display = 'inline-flex';
+                errorDiv.textContent = `Failed to load SBOM data: ${error.message}`;
+                errorDiv.style.display = 'block';
+            }
+        }
+        
+        function displaySbomData(data) {
+            displaySbomSummary(data);
+            const components = data.components || [];
+            displayComponents(components);
+            populateLicenseFilter(components);
+            setupTableControls(); // Call after license filter is populated
+            displayRawJson(data);
+        }
+        
+        function displaySbomSummary(data) {
+            const summarySection = document.getElementById('sbom-summary');
+            const metadataDiv = document.getElementById('sbom-metadata');
+            
+            const metadata = data.metadata || {};
+            const component = metadata.component || {};
+            
+            metadataDiv.innerHTML = `
+                <div class="metadata-item">
+                    <span class="metadata-label">Application</span>
+                    <span class="metadata-value">${component.name || 'N/A'}</span>
+                </div>
+                <div class="metadata-item">
+                    <span class="metadata-label">Version</span>
+                    <span class="metadata-value">${component.version || 'N/A'}</span>
+                </div>
+                <div class="metadata-item">
+                    <span class="metadata-label">SBOM Format</span>
+                    <span class="metadata-value">${data.bomFormat || 'N/A'}</span>
+                </div>
+                <div class="metadata-item">
+                    <span class="metadata-label">Spec Version</span>
+                    <span class="metadata-value">${data.specVersion || 'N/A'}</span>
+                </div>
+                <div class="metadata-item">
+                    <span class="metadata-label">Serial Number</span>
+                    <span class="metadata-value" style="word-break: break-all;">${data.serialNumber || 'N/A'}</span>
+                </div>
+                <div class="metadata-item">
+                    <span class="metadata-label">Generated</span>
+                    <span class="metadata-value">${metadata.timestamp ? new Date(metadata.timestamp).toLocaleString() : 'N/A'}</span>
+                </div>
+                <div class="metadata-item">
+                    <span class="metadata-label">Components Count</span>
+                    <span class="metadata-value">${(data.components || []).length}</span>
+                </div>
+                <div class="metadata-item">
+                    <span class="metadata-label">Dependencies Count</span>
+                    <span class="metadata-value">${(data.dependencies || []).length}</span>
+                </div>
+            `;
+            
+            summarySection.style.display = 'block';
+        }
+        
+        function displayComponents(components) {
+            const componentsSection = document.getElementById('components-section');
+            const componentCount = document.getElementById('component-count');
+            const tbody = document.getElementById('components-tbody');
+            
+            componentCount.textContent = components.length;
+            
+            // Build dependency map for lookups
+            const dependencyMap = {};
+            if (sbomData.dependencies) {
+                sbomData.dependencies.forEach(dep => {
+                    if (dep.dependsOn) {
+                        dependencyMap[dep.ref] = dep.dependsOn;
+                    }
+                });
+            }
+            
+            // Sort components by name for better readability
+            const sortedComponents = components.sort((a, b) => 
+                (a.name || '').localeCompare(b.name || '')
+            );
+            
+            tbody.innerHTML = sortedComponents.map(component => {
+                // Enhanced license detection
+                const license = detectLicense(component);
+                
+                // Extract source URLs
+                const sourceUrls = extractSourceUrls(component);
+                
+                // Get dependencies for this component
+                const dependencies = dependencyMap[component['bom-ref']] || [];
+                
+                // Extract security checksums
+                const checksums = extractChecksums(component);
+                
+                return `
+                    <tr style="border-bottom: 1px solid var(--border-color);" data-license="${normalizeLicenseForFilter(component)}">
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color); font-weight: 500;">
+                            <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                                <span style="font-weight: 600;">${component.name || 'N/A'}</span>
+                                <span style="font-size: 0.75rem; color: var(--text-secondary); font-family: monospace;">
+                                    ${component.purl || ''}
+                                </span>
+                            </div>
+                        </td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color); font-family: monospace; font-weight: 600;">
+                            ${component.version || 'N/A'}
+                        </td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">
+                            <span style="background: var(--primary-blue); color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem;">
+                                ${component.type || 'unknown'}
+                            </span>
+                        </td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color); max-width: 300px; word-wrap: break-word;">
+                            ${component.description || 'No description available'}
+                        </td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color); font-size: 0.875rem;">
+                            ${formatLicense(license)}
+                        </td>
+                        <td style="padding: 0.75rem; border: 1px solid var(--border-color);">
+                            ${formatSourceUrls(sourceUrls)}
+                        </td>
+                        <td class="dependencies-col" style="padding: 0.75rem; border: 1px solid var(--border-color);">
+                            ${formatDependencies(dependencies)}
+                        </td>
+                        <td class="checksums-col" style="padding: 0.75rem; border: 1px solid var(--border-color);">
+                            ${formatChecksums(checksums)}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            componentsSection.style.display = 'block';
+        }
+        
+        // Enhanced license database based on PyPI data
+        const PYPI_LICENSE_DATABASE = {
+            // Core Python packages
+            'setuptools': 'MIT',
+            'pip': 'MIT', 
+            'wheel': 'MIT',
+            'virtualenv': 'MIT',
+            
+            // Web frameworks
+            'flask': 'BSD-3-Clause',
+            'django': 'BSD-3-Clause',
+            'fastapi': 'MIT',
+            'starlette': 'BSD-3-Clause',
+            'uvicorn': 'BSD-3-Clause',
+            'chainlit': 'Apache-2.0',
+            
+            // HTTP libraries
+            'requests': 'Apache-2.0',
+            'urllib3': 'MIT',
+            'httpx': 'BSD-3-Clause',
+            'aiohttp': 'Apache-2.0',
+            
+            // Async/IO
+            'aiofiles': 'Apache-2.0',  // From PyPI lookup
+            'aiohappyeyeballs': 'PSF-2.0',
+            'asyncio': 'PSF-2.0',
+            
+            // Data processing
+            'numpy': 'BSD-3-Clause',
+            'pandas': 'BSD-3-Clause',
+            'scipy': 'BSD-3-Clause',
+            'matplotlib': 'PSF-2.0',
+            'pillow': 'HPND',
+            
+            // Text processing
+            'jinja2': 'BSD-3-Clause',
+            'markupsafe': 'BSD-3-Clause',
+            'beautifulsoup4': 'MIT',
+            'lxml': 'BSD-3-Clause',
+            'pyyaml': 'MIT',
+            
+            // Cryptography & Security
+            'cryptography': 'Apache-2.0 OR BSD-3-Clause',
+            'certifi': 'MPL-2.0',
+            'charset-normalizer': 'MIT',
+            'idna': 'BSD-3-Clause',
+            
+            // CLI & Utilities
+            'click': 'BSD-3-Clause',
+            'colorama': 'BSD-3-Clause',
+            'tqdm': 'MIT',
+            'python-dotenv': 'BSD-3-Clause',
+            
+            // Database & ORM
+            'sqlalchemy': 'MIT',
+            'psycopg2': 'LGPL-3.0',
+            'pymongo': 'Apache-2.0',
+            'redis': 'MIT',
+            
+            // Testing
+            'pytest': 'MIT',
+            'coverage': 'Apache-2.0',
+            'mock': 'BSD-2-Clause',
+            
+            // LangChain ecosystem
+            'langchain': 'MIT',
+            'langchain-core': 'MIT',
+            'langchain-community': 'MIT',
+            'langgraph': 'MIT',
+            'langsmith': 'MIT',
+            
+            // OpenAI & AI
+            'openai': 'Apache-2.0',
+            'anthropic': 'MIT',
+            
+            // Date/time
+            'pytz': 'MIT',
+            'dateutil': 'BSD-3-Clause',
+            
+            // Networking
+            'netifaces': 'MIT',
+            'websocket-client': 'Apache-2.0',
+            'websockets': 'BSD-3-Clause',
+            
+            // JSON & Data formats
+            'jsonschema': 'MIT',
+            'pydantic': 'MIT',
+            'marshmallow': 'MIT',
+            
+            // Development tools
+            'black': 'MIT',
+            'flake8': 'MIT',
+            'mypy': 'MIT',
+            'isort': 'MIT',
+            
+            // Scrapy ecosystem
+            'scrapy': 'BSD-3-Clause',
+            'twisted': 'MIT',
+            
+            // Supabase & APIs
+            'supabase': 'MIT',
+            'atlassian-python-api': 'Apache-2.0',
+            
+            // Graph & Network
+            'networkx': 'BSD-3-Clause',
+            'py2neo': 'Apache-2.0',
+            'neo4j': 'Apache-2.0'
+        };
+
+        // PyPI API lookup cache
+        const pypiLicenseCache = new Map();
+        
+        async function lookupLicenseFromPyPI(packageName, version) {
+            const cacheKey = `${packageName}@${version}`;
+            if (pypiLicenseCache.has(cacheKey)) {
+                return pypiLicenseCache.get(cacheKey);
+            }
+            
+            try {
+                // Use PyPI JSON API to get package metadata
+                const response = await fetch(`https://pypi.org/pypi/${packageName}/json`);
+                if (!response.ok) return null;
+                
+                const data = await response.json();
+                const license = data.info?.license || 
+                             data.info?.classifiers?.find(c => c.startsWith('License ::'))?.split(' :: ').pop() ||
+                             null;
+                
+                pypiLicenseCache.set(cacheKey, license);
+                return license;
+            } catch (error) {
+                console.warn(`Failed to lookup license for ${packageName}:`, error);
+                return null;
+            }
+        }
+
+        function detectLicense(component) {
+            // First check if component has licenses (now enhanced with PyPI data)
+            if (component.licenses && component.licenses.length > 0) {
+                const license = component.licenses[0].license;
+                const licenseValue = license?.id || license?.name;
+                
+                // Check if this was enhanced by our script
+                const properties = component.properties || [];
+                const licenseSource = properties.find(p => p.name === 'license-source');
+                
+                if (licenseSource) {
+                    let source = 'PyPI';
+                    if (licenseSource.value === 'pypi-api') source = 'PyPI API';
+                    else if (licenseSource.value === 'curated-alias') source = 'PyPI (alias)';
+                    else if (licenseSource.value === 'pypi-api-alias') source = 'PyPI API (alias)';
+                    return `${licenseValue} (${source})`;
+                }
+                
+                return licenseValue || 'Specified';
+            }
+            
+            const name = (component.name || '').toLowerCase();
+            const desc = (component.description || '').toLowerCase();
+            
+            // Check our comprehensive PyPI license database first
+            if (PYPI_LICENSE_DATABASE[name]) {
+                return PYPI_LICENSE_DATABASE[name] + ' (PyPI)';
+            }
+            
+            // Enhanced pattern matching in descriptions
+            if (name.includes('mit') || desc.includes('mit license') || desc.includes('mit-licensed')) return 'MIT (inferred)';
+            if (name.includes('apache') || desc.includes('apache') || desc.includes('apache license')) return 'Apache-2.0 (inferred)';
+            if (name.includes('bsd') || desc.includes('bsd') || desc.includes('berkeley software distribution')) return 'BSD-3-Clause (inferred)';
+            if (desc.includes('gpl') || desc.includes('gnu general public')) return 'GPL (inferred)';
+            if (desc.includes('lgpl') || desc.includes('lesser general public')) return 'LGPL (inferred)';
+            if (desc.includes('mozilla') || desc.includes('mpl')) return 'MPL-2.0 (inferred)';
+            if (desc.includes('creative commons') || desc.includes('cc-')) return 'CC (inferred)';
+            if (desc.includes('unlicense') || desc.includes('public domain')) return 'Public Domain (inferred)';
+            if (desc.includes('psf') || desc.includes('python software foundation')) return 'PSF-2.0 (inferred)';
+            
+            // Check for common license keywords
+            if (desc.includes('license') || desc.includes('licensed under')) return 'Licensed (type unknown)';
+            if (desc.includes('copyright') || desc.includes('all rights reserved')) return 'Proprietary (inferred)';
+            
+            // Suggest PyPI lookup for unknown licenses
+            if (name.length > 0) {
+                return 'Not specified (try PyPI lookup)';
+            }
+            
+            return 'Not specified';
+        }
+        
+        async function detectLicenseAsync(component) {
+            // Try synchronous detection first
+            const syncLicense = detectLicense(component);
+            if (!syncLicense.includes('Not specified') || !document.getElementById('enable-pypi-lookup')?.checked) {
+                return syncLicense;
+            }
+            
+            // Try PyPI lookup for missing licenses
+            const name = component.name;
+            const version = component.version;
+            if (name && version) {
+                const pypiLicense = await lookupLicenseFromPyPI(name, version);
+                if (pypiLicense) {
+                    return `${pypiLicense} (PyPI lookup)`;
+                }
+            }
+            
+            return syncLicense;
+        }
+        
+        function formatLicense(license) {
+            const lowerLicense = license.toLowerCase();
+            let bgColor = 'var(--text-secondary)';
+            
+            // Color coding for different license types
+            if (lowerLicense.includes('mit')) bgColor = 'var(--success-green)';
+            else if (lowerLicense.includes('apache')) bgColor = '#2563eb';
+            else if (lowerLicense.includes('bsd')) bgColor = '#7c3aed';
+            else if (lowerLicense.includes('gpl')) bgColor = '#dc2626'; // Red for GPL (copyleft)
+            else if (lowerLicense.includes('mozilla') || lowerLicense.includes('mpl')) bgColor = '#ea580c';
+            else if (lowerLicense.includes('public domain') || lowerLicense.includes('unlicense')) bgColor = '#16a34a';
+            else if (lowerLicense.includes('cc-') || lowerLicense.includes('creative commons')) bgColor = '#0891b2';
+            else if (lowerLicense.includes('psf') || lowerLicense.includes('python software foundation')) bgColor = '#0891b2';
+            else if (lowerLicense.includes('proprietary')) bgColor = '#dc2626';
+            else if (lowerLicense.includes('pypi')) bgColor = '#16a34a'; // Green for PyPI-sourced
+            else if (lowerLicense.includes('known') || lowerLicense.includes('inferred')) bgColor = '#ea580c';
+            else if (lowerLicense.includes('lookup')) bgColor = '#059669'; // Teal for API lookup
+            else if (lowerLicense.includes('try pypi')) bgColor = '#f59e0b'; // Amber for suggestion
+            else if (lowerLicense.includes('not specified')) bgColor = '#6b7280';
+            
+            // Add click handler for PyPI lookup suggestions
+            const clickHandler = lowerLicense.includes('try pypi') ? 
+                `onclick="window.open('https://pypi.org/project/${license.split('(')[0].trim()}/', '_blank')" style="cursor: pointer;"` : '';
+            
+            return `<span ${clickHandler} style="background: ${bgColor}; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; display: inline-block; min-width: 60px; text-align: center;">${license}</span>`;
+        }
+        
+        function extractSourceUrls(component) {
+            const urls = [];
+            if (component.externalReferences) {
+                // First, separate distribution URLs from other URLs
+                const distributionUrls = [];
+                const otherUrls = [];
+                
+                component.externalReferences.forEach(ref => {
+                    if (ref.url) {
+                        if (ref.type === 'distribution') {
+                            distributionUrls.push({
+                                url: ref.url,
+                                type: ref.type,
+                                comment: ref.comment,
+                                hashes: ref.hashes || []
+                            });
+                        } else if (ref.type === 'vcs' || ref.type === 'website') {
+                            otherUrls.push({
+                                url: ref.url,
+                                type: ref.type,
+                                comment: ref.comment
+                            });
+                        }
+                    }
+                });
+                
+                // For distribution URLs, prefer wheel (.whl) over source (.tar.gz)
+                // Poetry typically uses wheels when available
+                const preferredDistribution = distributionUrls.find(url => url.url.includes('.whl')) || 
+                                            distributionUrls.find(url => url.url.includes('.tar.gz')) ||
+                                            distributionUrls[0];
+                
+                if (preferredDistribution) {
+                    urls.push(preferredDistribution);
+                }
+                
+                // Add other URLs (VCS, website) - limit to 1-2 for space
+                urls.push(...otherUrls.slice(0, 2));
+            }
+            return urls;
+        }
+        
+        function formatSourceUrls(urls) {
+            if (urls.length === 0) return '<span style="color: var(--text-secondary);">No URLs</span>';
+            
+            return urls.slice(0, 2).map(url => {
+                const domain = new URL(url.url).hostname;
+                let typeIcon = '🌐';
+                let formatLabel = '';
+                
+                if (url.type === 'distribution') {
+                    if (url.url.includes('.whl')) {
+                        typeIcon = '🛞';
+                        formatLabel = ' wheel';
+                    } else if (url.url.includes('.tar.gz')) {
+                        typeIcon = '📦';
+                        formatLabel = ' source';
+                    } else {
+                        typeIcon = '📦';
+                    }
+                } else if (url.type === 'vcs') {
+                    typeIcon = '📂';
+                    formatLabel = ' repo';
+                }
+                
+                return `<a href="${url.url}" target="_blank" style="color: var(--primary-blue); text-decoration: none; font-size: 0.75rem; display: block; margin-bottom: 0.25rem;">${typeIcon} ${domain}${formatLabel}</a>`;
+            }).join('') + (urls.length > 2 ? `<span style="font-size: 0.75rem; color: var(--text-secondary);">+${urls.length - 2} more</span>` : '');
+        }
+        
+        function formatDependencies(dependencies) {
+            if (dependencies.length === 0) return '<span style="color: var(--text-secondary);">No dependencies</span>';
+            
+            const displayCount = 3;
+            const displayed = dependencies.slice(0, displayCount).map(dep => {
+                const name = dep.split('@')[0];
+                return `<span style="background: var(--card-background); padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.75rem; margin-right: 0.25rem; margin-bottom: 0.25rem; display: inline-block; border: 1px solid var(--border-color);">${name}</span>`;
+            }).join('');
+            
+            const remaining = dependencies.length - displayCount;
+            return displayed + (remaining > 0 ? `<span style="font-size: 0.75rem; color: var(--text-secondary); font-style: italic;">+${remaining} more</span>` : '');
+        }
+        
+        function extractChecksums(component) {
+            const checksums = [];
+            if (component.externalReferences) {
+                // Find the preferred distribution (wheel over source)
+                const wheelRef = component.externalReferences.find(ref => 
+                    ref.type === 'distribution' && ref.url && ref.url.includes('.whl')
+                );
+                const sourceRef = component.externalReferences.find(ref => 
+                    ref.type === 'distribution' && ref.url && ref.url.includes('.tar.gz')
+                );
+                
+                const preferredRef = wheelRef || sourceRef;
+                
+                if (preferredRef && preferredRef.hashes) {
+                    preferredRef.hashes.forEach(hash => {
+                        if (hash.alg === 'SHA-256') {
+                            checksums.push({
+                                hash: hash.content,
+                                format: preferredRef.url.includes('.whl') ? 'wheel' : 'source'
+                            });
+                        }
+                    });
+                }
+            }
+            return checksums;
+        }
+        
+        function formatChecksums(checksums) {
+            if (checksums.length === 0) return '<span style="color: var(--text-secondary);">No checksums</span>';
+            
+            return checksums.slice(0, 1).map(checksum => {
+                const hash = checksum.hash || checksum;
+                const format = checksum.format || 'unknown';
+                const short = hash.substring(0, 8) + '...';
+                const formatIcon = format === 'wheel' ? '🛞' : format === 'source' ? '📦' : '🔐';
+                
+                return `<div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                    <span style="font-family: monospace; font-size: 0.75rem; background: var(--card-background); padding: 0.25rem; border-radius: 0.25rem; border: 1px solid var(--border-color); cursor: help;" title="${hash}">${short}</span>
+                    <span style="font-size: 0.6rem; color: var(--text-secondary);">${formatIcon} ${format}</span>
+                </div>`;
+            }).join('');
+        }
+        
+        function normalizeLicenseForFilter(component) {
+            // Extract the same normalized license identifier used in the dropdown
+            if (component.licenses && component.licenses.length > 0) {
+                const license = component.licenses[0].license;
+                let licenseId = license.id || license.name || 'Unknown';
+                
+                // Apply the same normalization logic as populateLicenseFilter
+                if (licenseId.includes('MIT')) {
+                    return 'MIT';
+                } else if (licenseId.includes('Apache')) {
+                    return licenseId.includes('2.0') ? 'Apache-2.0' : 'Apache';
+                } else if (licenseId.includes('BSD')) {
+                    if (licenseId.includes('3-Clause') || licenseId.includes('3 Clause')) {
+                        return 'BSD-3-Clause';
+                    } else if (licenseId.includes('2-Clause') || licenseId.includes('2 Clause')) {
+                        return 'BSD-2-Clause';
+                    } else {
+                        return 'BSD';
+                    }
+                }
+                
+                return licenseId;
+            } else {
+                return 'Unknown/Not Specified';
+            }
+        }
+
+        function populateLicenseFilter(components) {
+            const licenseFilter = document.getElementById('license-filter');
+            const licenses = new Set();
+            
+            // Extract all unique licenses from components
+            components.forEach(component => {
+                if (component.licenses && component.licenses.length > 0) {
+                    component.licenses.forEach(licenseEntry => {
+                        const license = licenseEntry.license;
+                        let licenseId = license.id || license.name || 'Unknown';
+                        
+                        // Normalize license names for better deduplication
+                        // Extract the main license identifier (e.g., "MIT License" -> "MIT")
+                        if (licenseId.includes('MIT')) {
+                            licenseId = 'MIT';
+                        } else if (licenseId.includes('Apache')) {
+                            licenseId = licenseId.includes('2.0') ? 'Apache-2.0' : 'Apache';
+                        } else if (licenseId.includes('BSD')) {
+                            if (licenseId.includes('3-Clause') || licenseId.includes('3 Clause')) {
+                                licenseId = 'BSD-3-Clause';
+                            } else if (licenseId.includes('2-Clause') || licenseId.includes('2 Clause')) {
+                                licenseId = 'BSD-2-Clause';
+                            } else {
+                                licenseId = 'BSD';
+                            }
+                        }
+                        
+                        licenses.add(licenseId);
+                    });
+                } else {
+                    licenses.add('Unknown/Not Specified');
+                }
+            });
+            
+            // Clear existing options (except "All Licenses")
+            while (licenseFilter.children.length > 1) {
+                licenseFilter.removeChild(licenseFilter.lastChild);
+            }
+            
+            // Sort licenses alphabetically and add to dropdown
+            const sortedLicenses = Array.from(licenses).sort();
+            sortedLicenses.forEach(license => {
+                const option = document.createElement('option');
+                option.value = license;
+                option.textContent = license;
+                licenseFilter.appendChild(option);
+            });
+        }
+
+        function setupTableControls() {
+            const showDeps = document.getElementById('show-dependencies');
+            const showChecksums = document.getElementById('show-checksums');
+            const licenseFilter = document.getElementById('license-filter');
+            
+            function updateTableVisibility() {
+                const depCols = document.querySelectorAll('.dependencies-col');
+                const checksumCols = document.querySelectorAll('.checksums-col');
+                
+                depCols.forEach(col => {
+                    col.style.display = showDeps.checked ? '' : 'none';
+                });
+                
+                checksumCols.forEach(col => {
+                    col.style.display = showChecksums.checked ? '' : 'none';
+                });
+                
+                // License filtering
+                const rows = document.querySelectorAll('#components-tbody tr');
+                const filterValue = licenseFilter.value;
+                
+                rows.forEach(row => {
+                    const license = row.getAttribute('data-license') || '';
+                    let shouldShow = !filterValue;
+                    
+                    if (filterValue) {
+                        if (filterValue === 'Unknown/Not Specified') {
+                            shouldShow = license === '' || license.includes('Not specified') || license.includes('Unknown');
+                        } else {
+                            // Extract the main license identifier (before any parentheses or additional info)
+                            const mainLicense = license.split(' (')[0].trim();
+                            shouldShow = mainLicense === filterValue;
+                        }
+                    }
+                    
+                    row.style.display = shouldShow ? '' : 'none';
+                });
+            }
+            
+            showDeps.addEventListener('change', updateTableVisibility);
+            showChecksums.addEventListener('change', updateTableVisibility);
+            licenseFilter.addEventListener('change', updateTableVisibility);
+        }
+        
+        function displayRawJson(data) {
+            const rawJsonContent = document.getElementById('raw-json-content');
+            rawJsonContent.textContent = JSON.stringify(data, null, 2);
+        }
+        
+        function toggleRawJson() {
+            const rawJsonSection = document.getElementById('raw-json-section');
+            const toggleBtn = document.getElementById('toggle-raw-json');
+            
+            showingRawJson = !showingRawJson;
+            
+            if (showingRawJson) {
+                rawJsonSection.style.display = 'block';
+                toggleBtn.textContent = '📋 Hide Raw JSON';
+                rawJsonSection.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                rawJsonSection.style.display = 'none';
+                toggleBtn.textContent = '📄 Show Raw JSON';
+            }
+        }
+    </script>
+</body>
+</html>
