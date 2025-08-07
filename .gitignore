@@ -3,6 +3,12 @@ __pycache__
 .env
 .mypy_cache
 .pytest_cache
+.DS_Store
+jira_integration/
+.file_cache/
+.files/
+.vscode/
+
 
 # Keep SBOM files in repository for compliance
 # sbom.json

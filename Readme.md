@@ -12,52 +12,40 @@ You can ask the bot things like:
 * "Create a summary of the task Project X finished this week."
 * "Create an email of Project X for the stakeholders."
 
-## Running Modes
+## Key Capabilities
 
-Tahecho can run in two modes:
-
-### Full Mode (with Neo4j Graph Database)
-- **Complex relationship analysis** - Understand dependencies between issues
-- **Historical change tracking** - See what changed and when
-- **Dependency chain analysis** - Find blocking relationships
-- **Advanced graph-based queries** - Semantic search and reasoning
-- **All basic Jira operations** - Create, read, update issues
-
-### Limited Mode (without Neo4j)
-- **Basic Jira operations** - Direct issue management
-- **Task queries and updates** - Status changes, assignments
-- **MCP agent functionality** - Direct Jira API access
-- **No advanced analysis** - Limited to basic operations
-
-The app automatically detects which mode to use based on Neo4j availability.
+Tahecho provides powerful Jira management through natural language:
+- **All Jira operations** - Create, read, update, and search issues
+- **Natural language interface** - Ask questions in plain English
+- **Task management** - Status changes, assignments, and tracking
+- **MCP integration** - Direct, reliable Jira API access
+- **Multi-agent workflow** - Intelligent task routing and processing
 
 ## Integrations
 * **Jira Cloud** - Full API integration using MCP Atlassian server
-* **Neo4j Graph Database** (optional) - For advanced relationship analysis
 * **OpenAI GPT-4** - For natural language processing
 * **MCP (Model Context Protocol)** - For structured Jira interactions
 
 ## Architecture
 
 Tahecho uses a multi-agent system built with LangChain and LangGraph:
-- **Manager Agent**: Orchestrates and routes tasks to specialized agents
-- **Jira MCP Agent**: Handles Jira-specific operations using MCP Atlassian server
-- **MCP Agent**: Handles direct Jira operations (create, read, update issues)
-- **Graph Agent**: Performs complex reasoning using Neo4j graph database (when available)
-- **Task Classifier**: Determines which agent should handle each request
+- **Manager Agent**: Orchestrates and routes tasks using LangGraph workflow
+- **Task Classifier**: Determines which agent should handle each request (Jira vs general)
+- **Jira MCP Agent**: Handles all Jira operations using MCP Atlassian server
 
 ## Setup and Installation
 
 ### Prerequisites
 
 - Python 3.11+
-- [Poetry](https://python-poetry.org/) for dependency management
+- [Poetry](https://python-poetry.org/) for dependency management (**REQUIRED** - all commands must use Poetry)
 - Jira Cloud account with API access
 - OpenAI API key
-- Neo4j Database (optional, for full mode)
 - [uv](https://github.com/astral-sh/uv) for MCP server management (installed automatically)
 
 ### Quick Start
+
+**⚠️ IMPORTANT: Always use `poetry run` for all commands to ensure the correct Python environment and dependencies.**
 
 1. **Clone the repository**
    ```bash
@@ -65,77 +53,87 @@ Tahecho uses a multi-agent system built with LangChain and LangGraph:
    cd tahecho
    ```
 
-2. **Install dependencies**
+2. **Install Poetry and dependencies**
    ```bash
    # Install Poetry if you don't have it
    curl -sSL https://install.python-poetry.org | python3 -
    
-   # Install project dependencies
+   # Install project dependencies with Poetry
    poetry install
    ```
 
 3. **Set up environment variables**
    ```bash
    cp .env.example .env
-   # Edit .env with your actual values:
-   # - OPENAI_API_KEY (required)
-   # - JIRA_INSTANCE_URL (required)
-   # - JIRA_USERNAME (required)
-   # - JIRA_API_TOKEN (required)
-   # - GRAPH_DB_ENABLED (optional, defaults to True)
+   # Edit .env with your actual values
+   ```
+   
+   Create a `.env` file in the project root with these **required** variables:
+   ```bash
+   # OpenAI API Key (required)
+   OPENAI_API_KEY=your_openai_api_key_here
+
+   # Jira Configuration (required for Jira functionality)
+   JIRA_INSTANCE_URL=https://your-domain.atlassian.net
+   JIRA_USERNAME=your_email@domain.com
+   JIRA_API_TOKEN=your_jira_api_token
+   JIRA_CLOUD=True
    ```
 
-4. **Test your setup**
+4. **Test your setup** (use Poetry!)
    ```bash
-   poetry run python tests/smoke/test_setup.py
+   poetry run pytest tests/smoke/test_setup.py -v
    ```
 
 5. **Start the MCP-Atlassian server** (required for Jira integration)
    ```bash
    # Option 1: Use the helper script (recommended)
-   python start_mcp_server.py
+   poetry run python scripts/setup_mcp_jira.py
    
-   # Option 2: Start manually
+   # Option 2: Start manually (must have uv installed)
    uvx mcp-atlassian
    ```
 
-6. **Run the application**
+6. **Run the application** (use Poetry!)
    ```bash
-   # Using Poetry (recommended)
+   # Standard mode (recommended)
    poetry run chainlit run app.py
    
    # For development with auto-reload
    poetry run chainlit run app.py --watch
    
-   # Or minimal mode (no Neo4j required)
-   poetry run chainlit run app_minimal.py
+   # With debug mode and custom port
+   poetry run chainlit run app.py --watch --debug --port 8001
    ```
 
-### Local Development Setup
+### How It Works
 
-1. **Create virtual environment**
+Tahecho provides streamlined Jira operations through:
+- **Direct Jira operations** via MCP agent
+- **Natural language queries** for ticket management
+- **Task creation and updates** with simple commands
+- **JQL query support** for advanced filtering
+
+### Development Setup
+
+**⚠️ CRITICAL: Use Poetry for ALL commands to ensure correct dependencies and Python environment.**
+
+1. **Poetry manages the virtual environment automatically - no need to create one manually**
    ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   # Poetry creates and manages the virtual environment for you
+   poetry install  # This installs dependencies in Poetry's managed environment
    ```
 
-2. **Install dependencies**
+2. **Verify Poetry environment**
    ```bash
-   poetry install
-   ```
-
-3. **Set up Neo4j (optional - for full mode)**
-
-   **Neo4j AuraDB (Cloud)**
-   - Create account at https://neo4j.com/cloud/platform/aura-graph-database/
-   - Update connection string in your `.env` file
+   # Check which Python Poetry is using
+   poetry env info
    
-   **Local Neo4j Installation**
-   - Download and install Neo4j Desktop from https://neo4j.com/download/
-   - Create a new database with APOC plugin enabled
-   - Update connection details in your `.env` file
+   # Run commands in Poetry environment (always use this pattern)
+   poetry run python --version
+   ```
 
-4. **Run the application**
+3. **Run the application** (always with Poetry!)
    ```bash
    poetry run chainlit run app.py
    ```
@@ -202,57 +200,48 @@ The integration automatically manages the MCP Atlassian server, but requires:
 | `JIRA_USERNAME` | Jira username/email | Yes | - |
 | `JIRA_API_TOKEN` | Jira API token | Yes | - |
 | `JIRA_CLOUD` | Set to "true" for Jira Cloud | Yes | True |
-| `GRAPH_DB_ENABLED` | Enable/disable graph database | No | True |
-| `NEO4J_URI` | Neo4j connection URI | No | bolt://neo4j:7687 |
-| `NEO4J_USERNAME` | Neo4j username | No | neo4j |
-| `NEO4J_PASSWORD` | Neo4j password | No | test1234 |
 
-### Disabling Graph Database
+### Configuration Options
 
-To run without Neo4j, set in your `.env` file:
-```bash
-GRAPH_DB_ENABLED=False
-```
-
-### Custom Neo4j Connection
-
-If your Neo4j is running on a different host or port:
-```bash
-NEO4J_URI=bolt://localhost:7687
-NEO4J_USERNAME=your_username
-NEO4J_PASSWORD=your_password
-```
+All configuration is done through the `.env` file with the variables listed above.
 
 ## Testing and Diagnostics
 
 ### Test Setup
-```bash
-# Run comprehensive setup test
-python tests/smoke/test_setup.py
 
-# Demo different running modes
-python demo_modes.py
+**⚠️ ALWAYS use Poetry for tests to ensure correct Python environment:**
+
+```bash
+# Run comprehensive setup test (MUST use Poetry!)
+poetry run pytest tests/smoke/test_setup.py -v
+
+# Run all unit tests (MUST use Poetry!)
+poetry run pytest tests/unit/ -v
+
+# Run all tests (MUST use Poetry!)
+poetry run pytest -v
+
+# Run tests with coverage (MUST use Poetry!)
+poetry run pytest --cov=src --cov-report=html
+
+# Run specific test categories (MUST use Poetry!)
+poetry run pytest tests/unit/ -v          # Unit tests
+poetry run pytest tests/integration/ -v   # Integration tests
+poetry run pytest tests/smoke/ -v         # Smoke tests
 ```
 
 ### Troubleshooting
 
-**Graph Database Issues:**
-```bash
-# Test connection
-python -c "from utils.graph_db import graph_db_manager; print(graph_db_manager.connect())"
-```
+**⚠️ CRITICAL: All troubleshooting commands MUST use Poetry to work correctly.**
 
 **App Won't Start:**
 1. Verify all required environment variables are set
 2. Check OpenAI API key is valid
 3. Ensure Jira credentials are correct
-4. Run diagnostic script: `python tests/smoke/test_setup.py`
+4. Run diagnostic script: `poetry run pytest tests/smoke/test_setup.py -v`
+5. Verify Poetry environment: `poetry env info`
 
-**Limited Functionality:**
-If you see "Running in limited mode" message:
-- Neo4j is not available or not configured
-- App will still work for basic Jira operations
-- For full functionality, start Neo4j and ensure `GRAPH_DB_ENABLED=True`
+
 
 **Jira MCP Issues:**
 If Jira operations fail:
@@ -261,11 +250,28 @@ If Jira operations fail:
 3. Check network connectivity to your Jira instance
 4. Ensure `uv` is installed: `curl -LsSf https://astral.sh/uv/install.sh | sh`
 
-**Module Import Errors:**
+**Module Import Errors - THE MOST COMMON ISSUE:**
 If you get `ModuleNotFoundError: No module named 'tahecho'`:
-- Always use `poetry run` prefix for commands
-- Example: `poetry run chainlit run app.py`
-- Don't run `chainlit run app.py` directly
+- **ALWAYS use `poetry run` prefix for ALL commands**
+- ✅ Correct: `poetry run chainlit run app.py`
+- ❌ Wrong: `chainlit run app.py` (will fail)
+- ✅ Correct: `poetry run pytest tests/`
+- ❌ Wrong: `pytest tests/` (will fail)
+- ✅ Correct: `poetry run python script.py`
+- ❌ Wrong: `python script.py` (will fail)
+
+**Poetry Environment Issues:**
+```bash
+# Check Poetry is managing the right environment
+poetry env info
+
+# Rebuild Poetry environment if needed
+poetry env remove python
+poetry install
+
+# Always run commands through Poetry
+poetry run python --version  # Should show Python 3.11+
+```
 
 ## Development Workflow
 
@@ -279,26 +285,33 @@ We follow the **Red-Green-Refactor** cycle:
 
 ### Running Tests
 
+**⚠️ CRITICAL: ALL test commands MUST use Poetry - this is non-negotiable for correct operation.**
+
 ```bash
-# Run all tests
+# Run all tests (MUST use Poetry!)
 poetry run pytest
 
-# Run with coverage
+# Run with coverage (MUST use Poetry!)
 poetry run pytest --cov=src --cov-report=html
 
-# Run specific test categories
+# Run specific test categories (MUST use Poetry!)
 poetry run pytest tests/unit/          # Unit tests
 poetry run pytest tests/integration/   # Integration tests
 poetry run pytest tests/smoke/         # Smoke tests
 
-# Test Jira MCP integration specifically
+# Test Jira MCP integration specifically (MUST use Poetry!)
 poetry run python scripts/test_jira_integration.py
 
-# Run tests in watch mode (requires pytest-watch)
+# Run tests in watch mode (MUST use Poetry!)
 poetry run ptw
 
-# Run tests with verbose output
+# Run tests with verbose output (MUST use Poetry!)
 poetry run pytest -v
+
+# Run tests with specific markers (MUST use Poetry!)
+poetry run pytest -m unit      # Only unit tests
+poetry run pytest -m jira      # Only Jira-related tests
+poetry run pytest -m mcp       # Only MCP-related tests
 ```
 
 ### Test Structure
@@ -369,36 +382,49 @@ This will run:
 
 ### Code Quality
 
+**⚠️ IMPORTANT: Use Poetry for all code quality tools to ensure consistent environment.**
+
 ```bash
-# Format code
-black .
-isort .
+# Format code (use Poetry!)
+poetry run black .
+poetry run isort .
 
-# Lint code
-flake8
-mypy .
+# Lint code (use Poetry!)
+poetry run flake8
+poetry run mypy .
 
-# Run all quality checks
-pre-commit run --all-files
+# Run all quality checks (use Poetry!)
+poetry run pre-commit run --all-files
+
+# Install pre-commit hooks (use Poetry environment)
+poetry run pre-commit install
 ```
 
 ## Running the Application
 
+**⚠️ CRITICAL: ALWAYS use `poetry run` to start the application - this is mandatory.**
+
 ### Local Development
 ```bash
-# Standard mode - using Poetry
+# Standard mode (MUST use Poetry!)
 poetry run chainlit run app.py
 
-# Development mode with auto-reload (recommended for development)
+# Development mode with auto-reload (MUST use Poetry! - recommended for development)
 poetry run chainlit run app.py --watch
 
-# Development with debug mode and custom port
+# Development with debug mode and custom port (MUST use Poetry!)
 poetry run chainlit run app.py --watch --debug --port 8001
 
-# Minimal mode (no Neo4j required)
-poetry run chainlit run app_minimal.py
+# Check Poetry environment before running
+poetry env info  # Verify Python version and path
+```
 
-# If you get "ModuleNotFoundError: No module named 'tahecho'", use Poetry
+**❌ NEVER run these commands (they will fail):**
+```bash
+# These will NOT work and will give ModuleNotFoundError:
+chainlit run app.py           # ❌ Missing poetry run
+python app.py                 # ❌ Missing poetry run
+uvicorn app:app              # ❌ Missing poetry run
 ```
 
 The application will be available at http://localhost:8000
@@ -410,23 +436,21 @@ The application will be available at http://localhost:8000
 Ctrl+C
 ```
 
-## Features by Mode
+## Features
 
-| Feature | Full Mode | Limited Mode |
-|---------|-----------|--------------|
-| Basic Jira queries | ✅ | ✅ |
-| Issue status updates | ✅ | ✅ |
-| Task management | ✅ | ✅ |
-| **Jira MCP Integration** | ✅ | ✅ |
-| **Create/Update tickets** | ✅ | ✅ |
-| **JQL search queries** | ✅ | ✅ |
-| **Ticket details retrieval** | ✅ | ✅ |
-| Relationship analysis | ✅ | ❌ |
-| Dependency chains | ✅ | ❌ |
-| Historical changes | ✅ | ❌ |
-| Complex reasoning | ✅ | ❌ |
+Tahecho provides comprehensive Jira management capabilities:
 
-The app will automatically detect the available mode and adjust its behavior accordingly.
+| Feature | Status |
+|---------|--------|
+| **Basic Jira queries** | ✅ |
+| **Issue status updates** | ✅ |
+| **Task management** | ✅ |
+| **Jira MCP Integration** | ✅ |
+| **Create/Update tickets** | ✅ |
+| **JQL search queries** | ✅ |
+| **Ticket details retrieval** | ✅ |
+| **Natural language processing** | ✅ |
+| **Multi-agent workflow** | ✅ |
 
 ## License
 
@@ -439,13 +463,13 @@ This project complies with German BSI TR-03183 cybersecurity standards, specific
 ### SBOM Generation
 
 #### Automated Generation (Recommended)
-SBOM reports are automatically generated on every commit to the main branch via GitHub Actions and published to [GitHub Pages](https://your-username.github.io/tahecho/).
+SBOM reports are automatically generated during CI/CD pipelines and published to the `public/` folder for web serving and compliance documentation.
 
 #### Manual Generation
 Generate a Software Bill of Materials in CycloneDX format locally:
 
 ```bash
-# Using Poetry script
+# Using Poetry script (generates to public/ folder)
 poetry run generate-sbom
 
 # Or directly
@@ -453,8 +477,10 @@ python scripts/generate_sbom.py
 ```
 
 This will create:
-- `sbom.json` - CycloneDX JSON format (BSI preferred)
-- `sbom.xml` - CycloneDX XML format
+- `public/sbom.json` - CycloneDX JSON format (BSI preferred)
+- `public/sbom.xml` - CycloneDX XML format
+
+Files are automatically placed in the `public/` directory for web serving and compliance distribution.
 
 ### Compliance Features
 

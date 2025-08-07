@@ -6,11 +6,18 @@ Tests both full mode (with Neo4j) and limited mode (without Neo4j).
 
 import os
 import sys
+from pathlib import Path
 
+import pytest
 from dotenv import load_dotenv
 
+# Add the project root to Python path to enable imports
+project_root = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(project_root))
 
-def test_environment_variables():
+
+@pytest.mark.unit
+def test_environment_variables() -> None:
     """Test required environment variables."""
     print("🔍 Testing Environment Variables...")
 
@@ -18,178 +25,95 @@ def test_environment_variables():
 
     required_vars = {
         "OPENAI_API_KEY": "OpenAI API Key",
-        "JIRA_INSTANCE_URL": "Jira Instance URL",
+        "JIRA_INSTANCE_URL": "Jira Instance URL", 
         "JIRA_USERNAME": "Jira Username",
         "JIRA_API_TOKEN": "Jira API Token",
     }
 
-    optional_vars = {
-        # Graph database variables removed - using MCP agents only
-    }
-
     missing_required = []
-    missing_optional = []
 
     for var, description in required_vars.items():
         value = os.getenv(var)
         if not value:
-            missing_required.append(f"❌ {description} ({var})")
+            missing_required.append(f"{description} ({var})")
         else:
             print(f"✅ {description}: {'*' * len(value)}")
 
-    for var, description in optional_vars.items():
-        value = os.getenv(var)
-        if not value:
-            missing_optional.append(f"⚠️  {description} ({var}) - Optional")
-        else:
-            print(f"✅ {description}: {value}")
-
     if missing_required:
-        print("\n❌ Missing Required Environment Variables:")
-        for var in missing_required:
-            print(f"  {var}")
-        return False
-
-    if missing_optional:
-        print("\n⚠️  Missing Optional Environment Variables:")
-        for var in missing_optional:
-            print(f"  {var}")
+        pytest.fail(f"Missing required environment variables: {', '.join(missing_required)}")
 
     print("✅ Environment variables test completed")
-    return True
 
 
-def test_langchain_setup():
+@pytest.mark.unit
+def test_langchain_setup() -> None:
     """Test LangChain 0.3.x setup."""
     print("\n🔍 Testing LangChain Setup...")
 
-    try:
-        from langchain.chat_models import init_chat_model
+    from langchain.chat_models import init_chat_model
+    from config import CONFIG
 
-        from config import CONFIG
+    # Test chat model initialization
+    llm = init_chat_model(
+        CONFIG["OPENAI_SETTINGS"]["model"], model_provider="openai", temperature=0.1
+    )
 
-        # Test chat model initialization
-        llm = init_chat_model(
-            CONFIG["OPENAI_SETTINGS"]["model"], model_provider="openai", temperature=0.1
-        )
-
-        # Test a simple completion
-        response = llm.invoke("Hello, this is a test message.")
-        print(f"✅ LangChain chat model working: {response.content[:50]}...")
-        return True
-
-    except Exception as e:
-        print(f"❌ LangChain setup failed: {str(e)}")
-        return False
+    # Test a simple completion
+    response = llm.invoke("Hello, this is a test message.")
+    print(f"✅ LangChain chat model working: {response.content[:50]}...")
+    
+    assert response.content, "LangChain should return a response"
 
 
-def test_chainlit_setup():
+@pytest.mark.unit
+def test_chainlit_setup() -> None:
     """Test Chainlit setup."""
     print("\n🔍 Testing Chainlit Setup...")
 
-    try:
-        import chainlit as cl
+    import chainlit as cl
 
-        print("✅ Chainlit import successful")
-        return True
-    except Exception as e:
-        print(f"❌ Chainlit setup failed: {str(e)}")
-        return False
+    print("✅ Chainlit import successful")
+    assert cl is not None, "Chainlit should be importable"
 
 
 
-def test_jira_integration():
+@pytest.mark.unit  
+def test_jira_integration() -> None:
     """Test Jira integration setup."""
     print("\n🔍 Testing Jira Integration...")
 
-    try:
-        from tahecho.jira_integration.jira_client import JiraClient
+    from tahecho.jira_integration.jira_client import JiraClient
 
-        # Test client creation (without making actual requests)
-        client = JiraClient()
-        print("✅ Jira client creation successful")
-        return True
-
-    except Exception as e:
-        print(f"❌ Jira integration test failed: {str(e)}")
-        return False
+    # Test client creation (without making actual requests)
+    client = JiraClient()
+    print("✅ Jira client creation successful")
+    assert client is not None, "Jira client should be created successfully"
 
 
-def test_agent_setup():
+@pytest.mark.unit
+def test_agent_setup() -> None:
     """Test agent setup."""
     print("\n🔍 Testing Agent Setup...")
 
-    try:
-        from tahecho.agents.state import AgentState, create_initial_state
-        from tahecho.agents.task_classifier import task_classifier
+    from tahecho.agents.state import AgentState, create_initial_state
+    from tahecho.agents.task_classifier import get_task_classifier
 
-        # Test state creation
-        state = create_initial_state("Test message", "test_conversation")
-        print("✅ State management working")
+    # Test state creation
+    state = create_initial_state("Test message", "test_conversation")
+    print("✅ State management working")
+    assert state.user_input == "Test message", "State should be created with correct input"
 
-        # Test task classifier
-        result_state = task_classifier.classify_task(state)
-        print("✅ Task classifier working")
-
-        return True
-
-    except Exception as e:
-        print(f"❌ Agent setup test failed: {str(e)}")
-        return False
+    # Test task classifier - use the correct function
+    classifier = get_task_classifier()
+    result_state = classifier.classify_task(state)
+    print("✅ Task classifier working")
+    assert result_state.task_type in ["jira", "general"], "Task should be classified"
 
 
-def main():
-    """Run all setup tests."""
+# Legacy compatibility - keep for now but tests should be run via pytest
+if __name__ == "__main__":
     print("🧪 Tahecho Setup Test Suite")
     print("=" * 50)
-
-    tests = [
-        ("Environment Variables", test_environment_variables),
-        ("LangChain Setup", test_langchain_setup),
-        ("Chainlit Setup", test_chainlit_setup),
-        ("Jira Integration", test_jira_integration),
-        ("Agent Setup", test_agent_setup),
-    ]
-
-    results = []
-
-    for test_name, test_func in tests:
-        print(f"\n{'='*20} {test_name} {'='*20}")
-        try:
-            result = test_func()
-            results.append((test_name, result))
-        except Exception as e:
-            print(f"❌ {test_name} failed with exception: {str(e)}")
-            results.append((test_name, False))
-
-    # Summary
-    print("\n" + "=" * 50)
-    print("📊 TEST SUMMARY")
+    print("ℹ️  Please run tests using pytest:")
+    print("   poetry run pytest tests/smoke/test_setup.py -v")
     print("=" * 50)
-
-    passed = 0
-    failed = 0
-
-    for test_name, result in results:
-        status = "✅ PASS" if result else "❌ FAIL"
-        print(f"{status}: {test_name}")
-        if result:
-            passed += 1
-        else:
-            failed += 1
-
-    print(f"\nTotal: {passed + failed} tests")
-    print(f"Passed: {passed}")
-    print(f"Failed: {failed}")
-
-    if failed == 0:
-        print("\n🎉 All tests passed! Tahecho is ready to use.")
-        return True
-    else:
-        print(f"\n⚠️  {failed} test(s) failed. Please check the configuration.")
-        return False
-
-
-if __name__ == "__main__":
-    success = main()
-    sys.exit(0 if success else 1)

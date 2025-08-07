@@ -1,84 +1,115 @@
-name: Generate SBOM Reports
+name: SBOM Generation
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
   pull_request:
     branches: [ main ]
-  workflow_dispatch: # Allow manual triggering
+  schedule:
+    # Generate SBOM weekly on Sundays at 2 AM UTC
+    - cron: '0 2 * * 0'
 
 jobs:
   generate-sbom:
     runs-on: ubuntu-latest
-    
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
     steps:
-    - name: Checkout repository
+    - name: Checkout code
       uses: actions/checkout@v4
-      
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
-        
+
     - name: Install Poetry
       uses: snok/install-poetry@v1
       with:
         version: latest
         virtualenvs-create: true
         virtualenvs-in-project: true
-        
+
     - name: Load cached venv
       id: cached-poetry-dependencies
-      uses: actions/cache@v4
+      uses: actions/cache@v3
       with:
         path: .venv
         key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
-        
+
     - name: Install dependencies
       if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
       run: poetry install --no-interaction --no-root
-      
-    - name: Generate SBOM reports
+
+    - name: Install project
+      run: poetry install --no-interaction
+
+    - name: Generate SBOM
+      run: poetry run generate-sbom
+
+    - name: Verify SBOM files
       run: |
-        poetry run generate-sbom
+        echo "Checking generated SBOM files..."
+        ls -la public/sbom.*
+        echo "JSON file size: $(wc -c < public/sbom.json) bytes"
+        echo "XML file size: $(wc -c < public/sbom.xml) bytes"
         
+        # Basic validation
+        echo "Validating JSON structure..."
+        python -c "import json; json.load(open('public/sbom.json'))"
+        
+        echo "Validating XML structure..."
+        python -c "import xml.etree.ElementTree as ET; ET.parse('public/sbom.xml')"
+
     - name: Upload SBOM artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
         name: sbom-reports
-        path: |
-          sbom.json
-          sbom.xml
-        retention-days: 30
-        
-    - name: Create SBOM summary
-      run: |
-        echo "## SBOM Generation Summary" >> sbom-summary.md
-        echo "" >> sbom-summary.md
-        echo "**Generated:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> sbom-summary.md
-        echo "**Commit:** ${{ github.sha }}" >> sbom-summary.md
-        echo "**Branch:** ${{ github.ref_name }}" >> sbom-summary.md
-        echo "" >> sbom-summary.md
-        echo "### Files Generated:" >> sbom-summary.md
-        echo "- \`sbom.json\` - CycloneDX JSON format (BSI preferred)" >> sbom-summary.md
-        echo "- \`sbom.xml\` - CycloneDX XML format" >> sbom-summary.md
-        echo "" >> sbom-summary.md
-        echo "### BSI TR-03183 Compliance:" >> sbom-summary.md
-        echo "✅ Compliant with German BSI TR-03183 Part 2 'Software Bill of Materials'" >> sbom-summary.md
-        echo "✅ Industry standard CycloneDX format" >> sbom-summary.md
-        echo "✅ Complete dependency tracking" >> sbom-summary.md
-        echo "✅ License compliance documentation" >> sbom-summary.md
-        
-    - name: Commit and push SBOM reports
+        path: public/sbom.*
+        retention-days: 90
+
+    - name: Setup Pages
       if: github.ref == 'refs/heads/main'
-      run: |
-        git config --local user.email "github-actions[bot]@users.noreply.github.com"
-        git config --local user.name "github-actions[bot]"
-        git add sbom.json sbom.xml sbom-summary.md
-        git diff --staged --quiet || git commit -m "🤖 Auto-generate SBOM reports for BSI TR-03183 compliance
-        
-        - Generated on: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
-        - Commit: ${{ github.sha }}
-        - Format: CycloneDX (JSON + XML)
-        - Compliance: BSI TR-03183 Part 2"
-        git push 
+      uses: actions/configure-pages@v3
+
+    - name: Upload to GitHub Pages
+      if: github.ref == 'refs/heads/main'
+      uses: actions/upload-pages-artifact@v2
+      with:
+        path: public/
+
+    - name: Deploy to GitHub Pages
+      if: github.ref == 'refs/heads/main'
+      id: deployment
+      uses: actions/deploy-pages@v2
+
+  security-scan:
+    runs-on: ubuntu-latest
+    needs: generate-sbom
+    if: github.event_name == 'push' || github.event_name == 'schedule'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download SBOM artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: sbom-reports
+        path: public/
+
+    - name: Run vulnerability scan
+      uses: anchore/sbom-action@v0
+      with:
+        sbom: public/sbom.json
+        format: sarif
+        output-file: vulnerability-report.sarif
+
+    - name: Upload vulnerability report
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: vulnerability-report.sarif

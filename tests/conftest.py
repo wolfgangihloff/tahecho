@@ -9,8 +9,47 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-# Add project root to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+# Add project root and src to path
+project_root = os.path.join(os.path.dirname(__file__), "..")
+sys.path.insert(0, project_root)
+sys.path.insert(0, os.path.join(project_root, "src"))
+
+# Mock problematic imports that cause dependency issues
+def mock_supabase_modules():
+    """Mock Supabase-related modules to avoid dependency issues."""
+    import importlib.util
+    
+    # Mock modules that cause import errors
+    mock_modules = [
+        'websockets.asyncio',
+        'websockets.asyncio.client',
+        'realtime',
+        'realtime._async',
+        'realtime._async.client',
+        'supabase',
+    ]
+    
+    for module_name in mock_modules:
+        if module_name not in sys.modules:
+            # Create a mock module
+            mock_module = Mock()
+            mock_module.__name__ = module_name
+            mock_module.__file__ = f"<mock {module_name}>"
+            
+            # Add specific mocks for known imports
+            if module_name == 'websockets.asyncio.client':
+                mock_module.ClientConnection = Mock()
+            elif module_name == 'supabase':
+                mock_module.Client = Mock()
+                mock_module.create_client = Mock()
+            elif module_name == 'realtime':
+                mock_module.AuthorizationError = Exception
+                mock_module.NotConnectedError = Exception
+            
+            sys.modules[module_name] = mock_module
+
+# Apply mocks before other imports
+mock_supabase_modules()
 
 
 # Mock configuration for testing
